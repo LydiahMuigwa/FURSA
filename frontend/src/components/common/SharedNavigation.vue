@@ -98,10 +98,9 @@
                       class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
                 🎨 {{ t('navigation.join_creative') || 'Join as Creative Talent' }}
               </button>
-              <button @click="goToProviderDashboard" 
-                      class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                🔧 {{ t('navigation.join_provider') || 'Join as Service Provider' }}
-              </button>
+              <button @click="goToProviderOnboarding" 
+        class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+  🔧 {{ t('navigation.join_provider') || 'Join as Service Provider' }}</button>
             </div>
           </div>
 
@@ -161,10 +160,9 @@
 
         <!-- Join Mobile -->
         <div class="border-t border-gray-100 pt-2 space-y-1">
-          <button @click="goToProviderDashboard" 
-                  class="text-gray-700 hover:text-green-600 hover:bg-gray-50 block px-3 py-2 rounded-md text-base font-medium transition-colors w-full text-left">
-            🔧 {{ t('navigation.join_provider') || 'Join as Service Provider' }}
-          </button>
+          <button @click="goToProviderOnboarding" 
+        class="text-gray-700 hover:text-green-600 hover:bg-gray-50 block px-3 py-2 rounded-md text-base font-medium transition-colors w-full text-left">
+  🔧 {{ t('navigation.join_provider') || 'Join as Service Provider' }}</button>
         </div>
 
         <!-- CTA Mobile -->
@@ -290,7 +288,10 @@ const goToProviderDashboard = () => {
   router.push('/app/provider-dashboard')
   closeMobileMenu()
 }
-
+const goToProviderOnboarding = () => {
+  router.push('/app/join-as-provider')
+  closeMobileMenu()
+}
 const closeMobileMenu = () => {
   showMobileMenu.value = false
   showServicesMenu.value = false

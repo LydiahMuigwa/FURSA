@@ -1,4 +1,3 @@
-<!-- LandingPage.vue - Updated to use shared navigation -->
 <template>
   <div class="min-h-screen bg-gray-50">
     <!-- Shared Navigation -->
@@ -45,7 +44,7 @@
                 🗺️ Find Services Near Me
               </button>
               <button @click="goToProviderJoin" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
-                💼 Join as Service Provider
+                🔧 Join as Service Provider
               </button>
             </div>
           </div>
@@ -294,7 +293,7 @@ const popularServices = ref([
   { name: 'Mechanic', icon: '🔩', slug: 'mechanic', desc: 'Auto Repair' }
 ])
 
-// Navigation methods - FIXED ROUTES
+// Navigation methods
 const goToServices = () => {
   router.push('/app/services')
 }

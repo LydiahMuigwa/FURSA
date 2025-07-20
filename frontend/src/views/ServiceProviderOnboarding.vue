@@ -44,6 +44,27 @@
                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
           </div>
 
+          <!-- Email -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Email *</label>
+            <input v-model="formData.email" 
+                   type="email" 
+                   required
+                   placeholder="e.g., john@example.com"
+                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+          </div>
+
+          <!-- Password -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Password *</label>
+            <input v-model="formData.password" 
+                   type="password" 
+                   required
+                   minlength="8"
+                   placeholder="At least 8 characters"
+                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+          </div>
+
           <!-- Service Type -->
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">Service Type *</label>
@@ -57,6 +78,7 @@
               <option value="cleaner">🧹 Cleaner</option>
               <option value="painter">🎨 Painter</option>
               <option value="mechanic">🔩 Mechanic</option>
+              <option value="technician">💻 Technician</option>
               <option value="other">🛠️ Other</option>
             </select>
           </div>
@@ -64,11 +86,16 @@
           <!-- Location -->
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">Location *</label>
-            <input v-model="formData.location" 
-                   type="text" 
-                   required
-                   placeholder="e.g., Westlands, Nairobi"
-                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+            <div class="relative">
+              <input v-model="formData.location" 
+                    type="text" 
+                    required
+                    placeholder="e.g., Westlands, Nairobi"
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all pr-10">
+              <button type="button" @click="detectLocation" class="absolute right-3 top-3.5 text-blue-600 hover:text-blue-800">
+                <Locate class="w-5 h-5" />
+              </button>
+            </div>
           </div>
 
           <!-- Phone -->
@@ -97,11 +124,26 @@
 
           <!-- Description -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Brief Description</label>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Brief Description *</label>
             <textarea v-model="formData.description" 
                       rows="3"
+                      required
                       placeholder="Tell customers about your services and what makes you special..."
                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all resize-none"></textarea>
+            <p class="mt-1 text-xs text-gray-500">{{ formData.description.length }}/500 characters</p>
+          </div>
+
+          <!-- Terms Checkbox -->
+          <div class="flex items-start">
+            <div class="flex items-center h-5">
+              <input id="terms" v-model="formData.termsAccepted" 
+                     type="checkbox" 
+                     required
+                     class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded">
+            </div>
+            <div class="ml-3 text-sm">
+              <label for="terms" class="font-medium text-gray-700">I agree to the <a href="#" class="text-blue-600 hover:text-blue-800">Terms of Service</a> and <a href="#" class="text-blue-600 hover:text-blue-800">Privacy Policy</a></label>
+            </div>
           </div>
 
           <!-- Submit Button -->
@@ -172,72 +214,115 @@
         </button>
       </div>
     </div>
+
+    <!-- Error Notification -->
+    <div v-if="errorMessage" class="fixed bottom-4 right-4 z-50">
+      <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-lg shadow-lg flex items-start">
+        <div class="flex-shrink-0">
+          <XCircle class="w-5 h-5 text-red-500" />
+        </div>
+        <div class="ml-3">
+          <p class="text-sm font-medium">{{ errorMessage }}</p>
+        </div>
+        <button @click="errorMessage = ''" class="ml-auto pl-4">
+          <X class="w-4 h-4 text-red-500" />
+        </button>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { User, Check } from 'lucide-vue-next'
+import { User, Check, Locate, XCircle, X } from 'lucide-vue-next'
+import ApiService from '@/services/api'
 
 const router = useRouter()
 
 // Component state
 const isSubmitting = ref(false)
 const showSuccessModal = ref(false)
+const errorMessage = ref('')
 
 // Form data
 const formData = ref({
   name: '',
+  email: '',
+  password: '',
   serviceType: '',
   location: '',
   phone: '',
   experience: '',
-  description: ''
+  description: '',
+  termsAccepted: false
 })
 
 // Computed properties
 const isFormValid = computed(() => {
-  return formData.value.name.trim() &&
-         formData.value.serviceType &&
-         formData.value.location.trim() &&
-         formData.value.phone.trim() &&
-         formData.value.experience
+  return (
+    formData.value.name.trim() &&
+    formData.value.email.trim() &&
+    formData.value.password.length >= 8 &&
+    formData.value.serviceType &&
+    formData.value.location.trim() &&
+    formData.value.phone.trim() &&
+    formData.value.experience &&
+    formData.value.description.trim() &&
+    formData.value.termsAccepted
+  )
 })
 
 // Methods
+const detectLocation = () => {
+  if (navigator.geolocation) {
+    isSubmitting.value = true
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        // In a real app, you would reverse geocode these coordinates to get an address
+        formData.value.location = `Lat: ${position.coords.latitude}, Long: ${position.coords.longitude}`
+        isSubmitting.value = false
+      },
+      (error) => {
+        errorMessage.value = 'Could not detect your location. Please enter manually.'
+        isSubmitting.value = false
+      }
+    )
+  } else {
+    errorMessage.value = 'Geolocation is not supported by your browser'
+  }
+}
+
 const submitRegistration = async () => {
   if (!isFormValid.value) return
   
   isSubmitting.value = true
+  errorMessage.value = ''
   
   try {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000))
-    
-    // Create provider data
-    const providerData = {
+    // Call the API service
+    const response = await ApiService.createServiceProvider({
       ...formData.value,
-      id: Date.now(),
-      joinedAt: new Date().toISOString(),
-      rating: 0,
-      reviewCount: 0,
-      completedJobs: 0,
-      isVerified: false,
-      status: 'active'
+      // Add any additional fields the API expects
+      status: 'active',
+      languages: ['English', 'Swahili'], // Default values
+      availability: 'flexible'
+    })
+
+    // If registration includes authentication, store the token
+    if (response.token) {
+      localStorage.setItem('authToken', response.token)
     }
-    
-    // Store provider data in localStorage (temporary solution)
-    localStorage.setItem('fursa-provider', JSON.stringify(providerData))
-    
-    console.log('Provider registered:', providerData)
+
+    // Store provider ID for dashboard access
+    localStorage.setItem('fursa-provider-id', response.provider.id)
     
     // Show success modal
     showSuccessModal.value = true
     
   } catch (error) {
     console.error('Registration failed:', error)
-    alert('Registration failed. Please try again.')
+    errorMessage.value = error.response?.data?.message || 'Registration failed. Please try again.'
   } finally {
     isSubmitting.value = false
   }
@@ -247,6 +332,12 @@ const goToDashboard = () => {
   showSuccessModal.value = false
   router.push('/app/provider-dashboard')
 }
+
+// Auto-focus first input on mount
+onMounted(() => {
+  const firstInput = document.querySelector('input')
+  if (firstInput) firstInput.focus()
+})
 </script>
 
 <style scoped>

@@ -40,6 +40,20 @@ class ApiService {
     })
   }
 
+  async updateTalent(id, talentData) {
+    return this.request(`/api/talents/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(talentData),
+    })
+  }
+
+  async deleteTalent(id) {
+    return this.request(`/api/talents/${id}`, {
+      method: 'DELETE',
+    })
+  }
+
+  // File upload endpoint
   async uploadFiles(files) {
     const formData = new FormData()
     files.forEach(file => formData.append('files', file))
@@ -55,6 +69,66 @@ class ApiService {
   async searchTalents(query, filters = {}) {
     const params = new URLSearchParams({ q: query, ...filters })
     return this.request(`/api/search?${params}`)
+  }
+
+  // Service Provider endpoints
+  async createServiceProvider(providerData) {
+    return this.request('/api/service-providers', {
+      method: 'POST',
+      body: JSON.stringify(providerData),
+    })
+  }
+
+  async getServiceProvider(id) {
+    return this.request(`/api/service-providers/${id}`)
+  }
+
+  async getServiceProviders(filters = {}) {
+    const params = new URLSearchParams(filters)
+    return this.request(`/api/service-providers?${params}`)
+  }
+
+  async updateServiceProvider(id, providerData) {
+    return this.request(`/api/service-providers/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(providerData),
+    })
+  }
+
+  async deleteServiceProvider(id) {
+    return this.request(`/api/service-providers/${id}`, {
+      method: 'DELETE',
+    })
+  }
+
+  async addWorkStory(providerId, storyData) {
+    return this.request(`/api/service-providers/${providerId}/stories`, {
+      method: 'POST',
+      body: JSON.stringify(storyData),
+    })
+  }
+
+  async getWorkStories(providerId) {
+    return this.request(`/api/service-providers/${providerId}/stories`)
+  }
+
+  // Authentication endpoints
+  async login(credentials) {
+    return this.request('/api/auth/login', {
+      method: 'POST',
+      body: JSON.stringify(credentials),
+    })
+  }
+
+  async register(userData) {
+    return this.request('/api/auth/register', {
+      method: 'POST',
+      body: JSON.stringify(userData),
+    })
+  }
+
+  async getCurrentUser() {
+    return this.request('/api/auth/me')
   }
 }
 

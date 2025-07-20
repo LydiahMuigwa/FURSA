@@ -430,19 +430,28 @@
   </div>
 </template>
 
+<template>
+  <!-- [Previous template content remains exactly the same] -->
+</template>
+
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { 
   Bell, DollarSign, Star, Calendar, MapPin, Clock, Phone, Mail, MessageCircle,
-  CheckCircle, Settings, ChevronDown, Check
+  CheckCircle, Settings, ChevronDown, Check, BookOpen
 } from 'lucide-vue-next'
 import { useI18n } from 'vue-i18n'
+import ApiService from '@/services/api'
+import { useRouter } from 'vue-router'
 
 // Modal imports
 import QuoteResponseModal from '@/components/service-provider/modals/QuoteResponseModal.vue'
 import PhotoViewerModal from '@/components/service-provider/modals/PhotoViewerModal.vue'
 import QuoteResponseSuccessModal from '@/components/service-provider/modals/QuoteResponseSuccessModal.vue'
 import ScheduleManagementModal from '@/components/service-provider/modals/ScheduleManagementModal.vue'
+
+// Router
+const router = useRouter()
 
 // Component state
 const activeTab = ref('new')
@@ -455,6 +464,8 @@ const selectedQuote = ref(null)
 const selectedPhotos = ref([])
 const selectedPhotoIndex = ref(0)
 const lastQuoteResponse = ref(null)
+const isLoading = ref(true)
+const errorState = ref(null)
 
 // Language selector state
 const showLanguageDropdown = ref(false)
@@ -466,100 +477,26 @@ const currentLanguageName = computed(() => {
   return currentLanguage.value === 'sw' ? 'Kiswahili' : 'English'
 })
 
-// Provider data (would come from API/auth)
-const providerName = ref('John Mwangi')
+// Provider data
+const providerData = ref(null)
+const providerName = ref('')
 
+// Dashboard data
 const stats = ref({
-  newRequests: 3,
-  activeQuotes: 7,
-  rating: 4.8,
-  monthlyJobs: 12
+  newRequests: 0,
+  activeQuotes: 0,
+  rating: 0,
+  monthlyJobs: 0
 })
 
 const performance = ref({
-  responseRate: 95,
-  avgResponseTime: '2.3 hours',
-  jobsCompleted: 12
+  responseRate: 0,
+  avgResponseTime: '0 hours',
+  jobsCompleted: 0
 })
 
-// Sample quote data (would come from API)
-const quotes = ref([
-  {
-    id: 1,
-    customerName: 'Sarah Wanjiku',
-    serviceType: 'Electrical Installation',
-    description: 'Need to install new electrical outlets in my kitchen and upgrade the main panel. The current setup is quite old.',
-    location: 'Westlands, Nairobi',
-    budget: '15k_50k',
-    timeline: 'this_week',
-    phone: '+254712345678',
-    status: 'new',
-    submittedAt: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
-    referenceNumber: 'FR2024001',
-    photos: [
-      'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=400',
-      'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400'
-    ]
-  },
-  {
-    id: 2,
-    customerName: 'David Kimani',
-    serviceType: 'Home Wiring',
-    description: 'Complete rewiring needed for a 3-bedroom house. Some circuits are not working properly.',
-    location: 'Karen, Nairobi',
-    budget: 'over_100k',
-    timeline: 'within_month',
-    phone: '+254723456789',
-    status: 'new',
-    submittedAt: new Date(Date.now() - 5 * 60 * 60 * 1000), // 5 hours ago
-    referenceNumber: 'FR2024002',
-    photos: []
-  },
-  {
-    id: 3,
-    customerName: 'Grace Muthoni',
-    serviceType: 'Electrical Repair',
-    description: 'Power outlets in the living room stopped working after a storm. Need urgent repair.',
-    location: 'Kilimani, Nairobi',
-    budget: '5k_15k',
-    timeline: 'asap',
-    phone: '+254734567890',
-    status: 'quoted',
-    submittedAt: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 day ago
-    respondedAt: new Date(Date.now() - 23 * 60 * 60 * 1000), // 23 hours ago
-    referenceNumber: 'FR2024003',
-    response: 'Thank you for reaching out. I can help with your electrical repair. Based on your description, this sounds like a circuit breaker issue. I can visit today to diagnose and fix the problem.',
-    quoteAmount: 'KES 8,500',
-    photos: []
-  }
-])
-
-const recentActivity = ref([
-  {
-    id: 1,
-    type: 'quote',
-    description: 'New quote request from Sarah Wanjiku',
-    timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000)
-  },
-  {
-    id: 2,
-    type: 'review',
-    description: 'Received 5-star review from Peter Ochieng',
-    timestamp: new Date(Date.now() - 6 * 60 * 60 * 1000)
-  },
-  {
-    id: 3,
-    type: 'job',
-    description: 'Completed electrical installation for Mary Njeri',
-    timestamp: new Date(Date.now() - 12 * 60 * 60 * 1000)
-  },
-  {
-    id: 4,
-    type: 'quote',
-    description: 'Quote accepted by James Mwangi',
-    timestamp: new Date(Date.now() - 18 * 60 * 60 * 1000)
-  }
-])
+const quotes = ref([])
+const recentActivity = ref([])
 
 // Computed properties
 const newQuotes = computed(() => {
@@ -567,17 +504,99 @@ const newQuotes = computed(() => {
 })
 
 const respondedQuotes = computed(() => {
-  return quotes.value.filter(quote => quote.status === 'quoted')
+  return quotes.value.filter(quote => quote.status === 'quoted' || quote.status === 'accepted')
 })
 
 // Methods
+const loadProviderData = async () => {
+  const providerId = localStorage.getItem('fursa-provider-id')
+  if (providerId) {
+    try {
+      const provider = await ApiService.getServiceProvider(providerId)
+      providerData.value = provider
+      providerName.value = provider.name
+      
+      // Load dashboard data after provider data is loaded
+      await loadDashboardData()
+    } catch (error) {
+      console.error('Error loading provider data:', error)
+      errorState.value = t('errors.load_provider_failed')
+      providerName.value = t('defaults.provider_name')
+    }
+  } else {
+    // Redirect to login if no provider ID found
+    router.push('/login?redirect=/app/provider-dashboard')
+  }
+}
+
+const loadDashboardData = async () => {
+  try {
+    isLoading.value = true
+    
+    // Load stats
+    const statsResponse = await ApiService.getServiceProviderStats(providerData.value.id)
+    stats.value = {
+      newRequests: statsResponse.pendingQuotes || 0,
+      activeQuotes: statsResponse.activeQuotes || 0,
+      rating: statsResponse.averageRating || 0,
+      monthlyJobs: statsResponse.monthlyJobs || 0
+    }
+    
+    // Load performance metrics
+    const performanceResponse = await ApiService.getProviderPerformance(providerData.value.id)
+    performance.value = {
+      responseRate: performanceResponse.responseRate || 0,
+      avgResponseTime: performanceResponse.avgResponseTime || '0 hours',
+      jobsCompleted: performanceResponse.completedJobs || 0
+    }
+    
+    // Load recent quotes
+    const quotesResponse = await ApiService.getProviderQuotes(providerData.value.id)
+    quotes.value = quotesResponse.map(quote => ({
+      id: quote.id,
+      customerName: quote.customer.name,
+      serviceType: quote.serviceType,
+      description: quote.description,
+      location: quote.location,
+      budget: quote.budgetRange,
+      timeline: quote.timeline,
+      phone: quote.customer.phone,
+      status: quote.status,
+      submittedAt: new Date(quote.createdAt),
+      respondedAt: quote.respondedAt ? new Date(quote.respondedAt) : null,
+      referenceNumber: quote.referenceNumber,
+      response: quote.providerResponse,
+      quoteAmount: quote.quoteAmount ? `KES ${quote.quoteAmount.toLocaleString()}` : null,
+      photos: quote.attachments || []
+    }))
+    
+    // Load recent activity
+    const activityResponse = await ApiService.getProviderActivity(providerData.value.id)
+    recentActivity.value = activityResponse.map(activity => ({
+      id: activity.id,
+      type: activity.type,
+      description: activity.description,
+      timestamp: new Date(activity.createdAt)
+    }))
+    
+  } catch (error) {
+    console.error('Error loading dashboard data:', error)
+    errorState.value = t('errors.load_dashboard_failed')
+  } finally {
+    isLoading.value = false
+  }
+}
+
 const formatTimeAgo = (date) => {
   const now = new Date()
   const diff = now - date
   const hours = Math.floor(diff / (1000 * 60 * 60))
   const minutes = Math.floor(diff / (1000 * 60))
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24))
   
-  if (hours > 0) {
+  if (days > 0) {
+    return `${days}d ago`
+  } else if (hours > 0) {
     return `${hours}h ago`
   } else {
     return `${minutes}m ago`
@@ -586,23 +605,23 @@ const formatTimeAgo = (date) => {
 
 const formatBudget = (budget) => {
   const budgetMap = {
-    'under_5k': 'Under KES 5,000',
-    '5k_15k': 'KES 5,000 - 15,000',
-    '15k_50k': 'KES 15,000 - 50,000',
-    '50k_100k': 'KES 50,000 - 100,000',
-    'over_100k': 'Over KES 100,000'
+    'under_5k': t('formats.budget.under_5k'),
+    '5k_15k': t('formats.budget.5k_15k'),
+    '15k_50k': t('formats.budget.15k_50k'),
+    '50k_100k': t('formats.budget.50k_100k'),
+    'over_100k': t('formats.budget.over_100k')
   }
   return budgetMap[budget] || budget
 }
 
 const formatTimeline = (timeline) => {
   const timelineMap = {
-    'asap': 'ASAP',
-    'today': 'Today',
-    'this_week': 'This week',
-    'next_week': 'Next week',
-    'within_month': 'Within a month',
-    'flexible': 'Flexible'
+    'asap': t('formats.timeline.asap'),
+    'today': t('formats.timeline.today'),
+    'this_week': t('formats.timeline.this_week'),
+    'next_week': t('formats.timeline.next_week'),
+    'within_month': t('formats.timeline.within_month'),
+    'flexible': t('formats.timeline.flexible')
   }
   return timelineMap[timeline] || timeline
 }
@@ -613,8 +632,20 @@ const switchToLanguage = (langCode) => {
   localStorage.setItem('fursa-language', langCode)
   showLanguageDropdown.value = false
   
-  const languageName = langCode === 'sw' ? 'Kiswahili' : 'English'
-  console.log(`Language switched to ${languageName}`)
+  // Update language preference on server if logged in
+  if (providerData.value) {
+    updateLanguagePreference(langCode)
+  }
+}
+
+const updateLanguagePreference = async (langCode) => {
+  try {
+    await ApiService.updateProviderPreferences(providerData.value.id, {
+      language: langCode
+    })
+  } catch (error) {
+    console.error('Failed to update language preference:', error)
+  }
 }
 
 // Modal functions
@@ -629,28 +660,45 @@ const openPhotoModal = (photos, index) => {
   showPhotoModal.value = true
 }
 
-const handleQuoteResponse = (responseData) => {
-  console.log('Quote response submitted:', responseData)
-  
-  // Update the quote status
-  const quoteIndex = quotes.value.findIndex(q => q.id === responseData.quoteId)
-  if (quoteIndex !== -1) {
-    quotes.value[quoteIndex].status = 'quoted'
-    quotes.value[quoteIndex].response = responseData.message
-    quotes.value[quoteIndex].quoteAmount = `KES ${responseData.amount}`
-    quotes.value[quoteIndex].respondedAt = new Date()
+const handleQuoteResponse = async (responseData) => {
+  try {
+    const response = await ApiService.respondToQuote(
+      selectedQuote.value.id,
+      {
+        amount: responseData.amount,
+        message: responseData.message,
+        contactPreference: responseData.contactPreference
+      }
+    )
+    
+    // Update local state
+    const quoteIndex = quotes.value.findIndex(q => q.id === selectedQuote.value.id)
+    if (quoteIndex !== -1) {
+      quotes.value[quoteIndex].status = 'quoted'
+      quotes.value[quoteIndex].response = responseData.message
+      quotes.value[quoteIndex].quoteAmount = `KES ${responseData.amount}`
+      quotes.value[quoteIndex].respondedAt = new Date()
+      
+      // Update stats
+      stats.value.activeQuotes += 1
+      stats.value.newRequests -= 1
+    }
+    
+    // Store response data for success modal
+    lastQuoteResponse.value = {
+      customerName: selectedQuote.value.customerName,
+      quoteAmount: responseData.amount,
+      contactMethod: responseData.contactPreference
+    }
+    
+    // Close response modal and show success modal
+    showResponseModal.value = false
+    showSuccessModal.value = true
+    
+  } catch (error) {
+    console.error('Error submitting quote response:', error)
+    errorState.value = t('errors.quote_response_failed')
   }
-  
-  // Store response data for success modal
-  lastQuoteResponse.value = {
-    customerName: selectedQuote.value?.customerName,
-    quoteAmount: responseData.amount,
-    contactMethod: responseData.contactPreference
-  }
-  
-  // Close response modal and show success modal
-  showResponseModal.value = false
-  showSuccessModal.value = true
 }
 
 const callCustomer = (phone) => {
@@ -658,14 +706,22 @@ const callCustomer = (phone) => {
 }
 
 const whatsappCustomer = (quote) => {
-  const message = encodeURIComponent(`Hi ${quote.customerName}! I received your quote request through FURSA (Ref: #${quote.referenceNumber}). I'd like to discuss your ${quote.serviceType} project. When would be a good time to talk?`)
+  const message = encodeURIComponent(
+    t('messages.whatsapp_template', {
+      customerName: quote.customerName,
+      referenceNumber: quote.referenceNumber,
+      serviceType: quote.serviceType
+    })
+  )
   window.open(`https://wa.me/${quote.phone.replace('+', '')}?text=${message}`, '_blank')
 }
 
 const handleViewResponded = () => {
   activeTab.value = 'responded'
+  showSuccessModal.value = false
 }
 
+// Initialize
 onMounted(() => {
   // Initialize language from localStorage if available
   const savedLanguage = localStorage.getItem('fursa-language')
@@ -673,22 +729,26 @@ onMounted(() => {
     locale.value = savedLanguage
   }
   
+  // Load provider data
+  loadProviderData()
+  
   // Check for story published success
   const urlParams = new URLSearchParams(window.location.search)
   if (urlParams.get('story') === 'published') {
-    // Show success notification
+    // You could show a toast notification here
     console.log('🎉 Story published successfully!')
-    // You could add a toast notification here
     
     // Clean up URL
     const url = new URL(window.location)
     url.searchParams.delete('story')
     window.history.replaceState({}, '', url)
   }
-  
-  console.log('Dashboard loaded with working language selector!')
 })
 </script>
+
+<style scoped>
+/* [Previous styles remain the same] */
+</style>
 
 <style scoped>
 .line-clamp-2 {

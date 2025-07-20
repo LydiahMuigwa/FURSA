@@ -39,6 +39,12 @@ app.get('/', (req, res) => {
   res.json({ message: 'ZIVU API is running!' });
 });
 
+const serviceProviderRoutes = require('./routes/serviceProviders')
+app.use('/api/service-providers', serviceProviderRoutes)
+
+const talentRoutes = require('./routes/talent')
+app.use('/api/talent', talentRoutes)
+
 // Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('✅ Connected to MongoDB'))
