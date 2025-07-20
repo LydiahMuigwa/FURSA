@@ -1,287 +1,298 @@
-<!-- ServiceProviderDashboard.vue - CLEAN VERSION WITHOUT NAVIGATION -->
+<!-- ServiceProviderDashboard.vue - Updated with working modals -->
 <template>
-  <!-- SIMPLE CONTAINER - NO NAVIGATION, NO FULL SCREEN -->
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <!-- Dashboard Header -->
-    <div class="mb-8">
-      <h2 class="text-2xl font-bold text-gray-900 mb-2">Welcome back, {{ providerName }}!</h2>
-      <p class="text-gray-600">Manage your quote requests and grow your business</p>
+  <div class="min-h-screen bg-gray-50">
+    <!-- Header -->
+    <div class="bg-white shadow">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center py-4">
+          <div>
+            <h1 class="text-2xl font-bold text-gray-900">Provider Dashboard</h1>
+            <p class="text-gray-600">Welcome back, {{ providerName }}!</p>
+          </div>
+          <div class="flex items-center space-x-4">
+            <button class="p-2 text-gray-400 hover:text-gray-600 transition-colors">
+              <Bell class="w-6 h-6" />
+            </button>
+            <button class="p-2 text-gray-400 hover:text-gray-600 transition-colors">
+              <Settings class="w-6 h-6" />
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Stats Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-      <div class="bg-white rounded-lg shadow p-6">
-        <div class="flex items-center">
-          <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
-            <Bell class="w-4 h-4 text-blue-600" />
-          </div>
-          <div>
-            <p class="text-sm font-medium text-gray-600">New Requests</p>
-            <p class="text-2xl font-bold text-gray-900">{{ stats.newRequests }}</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="bg-white rounded-lg shadow p-6">
-        <div class="flex items-center">
-          <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mr-4">
-            <DollarSign class="w-4 h-4 text-green-600" />
-          </div>
-          <div>
-            <p class="text-sm font-medium text-gray-600">Active Quotes</p>
-            <p class="text-2xl font-bold text-gray-900">{{ stats.activeQuotes }}</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="bg-white rounded-lg shadow p-6">
-        <div class="flex items-center">
-          <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center mr-4">
-            <Star class="w-4 h-4 text-purple-600" />
-          </div>
-          <div>
-            <p class="text-sm font-medium text-gray-600">Rating</p>
-            <p class="text-2xl font-bold text-gray-900">{{ stats.rating }}</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="bg-white rounded-lg shadow p-6">
-        <div class="flex items-center">
-          <div class="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center mr-4">
-            <Calendar class="w-4 h-4 text-orange-600" />
-          </div>
-          <div>
-            <p class="text-sm font-medium text-gray-600">This Month</p>
-            <p class="text-2xl font-bold text-gray-900">{{ stats.monthlyJobs }}</p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Main Content -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-      <!-- Quote Requests List -->
-      <div class="lg:col-span-2">
-        <div class="bg-white rounded-lg shadow">
-          <div class="px-6 py-4 border-b border-gray-200">
-            <div class="flex justify-between items-center">
-              <h3 class="text-lg font-semibold text-gray-900">Quote Requests</h3>
-              <div class="flex space-x-2">
-                <button @click="activeTab = 'new'" 
-                        :class="[
-                          'px-3 py-1 rounded-full text-sm font-medium transition-colors',
-                          activeTab === 'new' 
-                            ? 'bg-blue-100 text-blue-800' 
-                            : 'text-gray-600 hover:text-gray-900'
-                        ]">
-                  New ({{ newQuotes.length }})
-                </button>
-                <button @click="activeTab = 'responded'" 
-                        :class="[
-                          'px-3 py-1 rounded-full text-sm font-medium transition-colors',
-                          activeTab === 'responded' 
-                            ? 'bg-blue-100 text-blue-800' 
-                            : 'text-gray-600 hover:text-gray-900'
-                        ]">
-                  Responded ({{ respondedQuotes.length }})
-                </button>
-              </div>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white rounded-lg shadow p-6">
+          <div class="flex items-center">
+            <div class="p-3 bg-blue-100 rounded-lg">
+              <Bell class="w-6 h-6 text-blue-600" />
+            </div>
+            <div class="ml-4">
+              <p class="text-sm text-gray-600">New Requests</p>
+              <p class="text-2xl font-bold text-gray-900">{{ stats.newRequests }}</p>
             </div>
           </div>
+        </div>
 
-          <div class="divide-y divide-gray-200">
-            <!-- New Quote Requests -->
-            <div v-if="activeTab === 'new'">
-              <div v-if="newQuotes.length === 0" class="p-8 text-center">
-                <Bell class="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <h4 class="text-lg font-medium text-gray-900 mb-2">No new requests</h4>
-                <p class="text-gray-600">New quote requests will appear here</p>
-              </div>
-              
-              <div v-for="quote in newQuotes" :key="quote.id" 
-                   class="p-6 hover:bg-gray-50 transition-colors">
-                <div class="flex justify-between items-start mb-4">
-                  <div>
-                    <h4 class="font-semibold text-gray-900">{{ quote.customerName }}</h4>
-                    <p class="text-sm text-gray-600">{{ quote.serviceType }}</p>
-                    <div class="flex items-center mt-1 text-xs text-gray-500">
-                      <MapPin class="w-3 h-3 mr-1" />
-                      {{ quote.location }}
-                      <span class="mx-2">•</span>
-                      <Clock class="w-3 h-3 mr-1" />
-                      {{ formatTimeAgo(quote.submittedAt) }}
-                    </div>
-                  </div>
-                  <div class="flex items-center space-x-2">
-                    <span :class="[
-                      'px-2 py-1 rounded-full text-xs font-medium',
-                      quote.urgency === 'urgent' ? 'bg-red-100 text-red-800' :
-                      quote.urgency === 'soon' ? 'bg-yellow-100 text-yellow-800' :
-                      'bg-green-100 text-green-800'
-                    ]">
-                      {{ quote.urgency }}
-                    </span>
-                    <span class="text-xs text-gray-500">#{{ quote.referenceNumber }}</span>
-                  </div>
-                </div>
+        <div class="bg-white rounded-lg shadow p-6">
+          <div class="flex items-center">
+            <div class="p-3 bg-green-100 rounded-lg">
+              <DollarSign class="w-6 h-6 text-green-600" />
+            </div>
+            <div class="ml-4">
+              <p class="text-sm text-gray-600">Active Quotes</p>
+              <p class="text-2xl font-bold text-gray-900">{{ stats.activeQuotes }}</p>
+            </div>
+          </div>
+        </div>
 
-                <p class="text-gray-700 mb-4 line-clamp-2">{{ quote.description }}</p>
+        <div class="bg-white rounded-lg shadow p-6">
+          <div class="flex items-center">
+            <div class="p-3 bg-yellow-100 rounded-lg">
+              <Star class="w-6 h-6 text-yellow-600" />
+            </div>
+            <div class="ml-4">
+              <p class="text-sm text-gray-600">Rating</p>
+              <p class="text-2xl font-bold text-gray-900">{{ stats.rating }}</p>
+            </div>
+          </div>
+        </div>
 
-                <!-- Photos -->
-                <div v-if="quote.photos && quote.photos.length > 0" class="mb-4">
-                  <div class="flex space-x-2">
-                    <img v-for="(photo, index) in quote.photos.slice(0, 3)" 
-                         :key="index"
-                         :src="photo.preview" 
-                         :alt="`Photo ${index + 1}`"
-                         class="w-16 h-16 object-cover rounded-lg cursor-pointer hover:opacity-80 transition-opacity"
-                         @click="openPhotoModal(quote.photos, index)" />
-                    <div v-if="quote.photos.length > 3" 
-                         class="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center text-xs text-gray-600 cursor-pointer hover:bg-gray-200 transition-colors"
-                         @click="openPhotoModal(quote.photos, 3)">
-                      +{{ quote.photos.length - 3 }}
-                    </div>
-                  </div>
-                </div>
+        <div class="bg-white rounded-lg shadow p-6">
+          <div class="flex items-center">
+            <div class="p-3 bg-purple-100 rounded-lg">
+              <Calendar class="w-6 h-6 text-purple-600" />
+            </div>
+            <div class="ml-4">
+              <p class="text-sm text-gray-600">This Month</p>
+              <p class="text-2xl font-bold text-gray-900">{{ stats.monthlyJobs }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
 
-                <!-- Budget and Timeline -->
-                <div class="flex items-center space-x-4 mb-4 text-sm text-gray-600">
-                  <div v-if="quote.budget" class="flex items-center">
-                    <DollarSign class="w-4 h-4 mr-1" />
-                    {{ formatBudget(quote.budget) }}
-                  </div>
-                  <div class="flex items-center">
-                    <Calendar class="w-4 h-4 mr-1" />
-                    {{ formatTimeline(quote.timeline) }}
-                  </div>
-                </div>
-
-                <!-- Contact Info -->
-                <div class="flex items-center justify-between">
-                  <div class="flex items-center space-x-4 text-sm text-gray-600">
-                    <div class="flex items-center">
-                      <Phone class="w-4 h-4 mr-1" />
-                      {{ quote.phone }}
-                    </div>
-                    <div class="flex items-center">
-                      <Mail class="w-4 h-4 mr-1" />
-                      {{ quote.email }}
-                    </div>
-                  </div>
-                  <div class="flex space-x-2">
-                    <button @click="respondToQuote(quote)" 
-                            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
-                      Respond
-                    </button>
-                    <button @click="callCustomer(quote.phone)" 
-                            class="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg transition-colors">
-                      <Phone class="w-4 h-4" />
-                    </button>
-                    <button @click="whatsappCustomer(quote)" 
-                            class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg transition-colors">
-                      <MessageCircle class="w-4 h-4" />
-                    </button>
-                  </div>
+      <!-- Main Content -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Quote Requests -->
+        <div class="lg:col-span-2">
+          <div class="bg-white rounded-lg shadow">
+            <div class="p-6 border-b border-gray-200">
+              <div class="flex justify-between items-center">
+                <h3 class="text-lg font-semibold text-gray-900">Quote Requests</h3>
+                <div class="flex space-x-2">
+                  <button @click="activeTab = 'new'" 
+                          :class="[
+                            'px-3 py-1 rounded-full text-sm font-medium transition-colors',
+                            activeTab === 'new' 
+                              ? 'bg-blue-100 text-blue-800' 
+                              : 'text-gray-600 hover:text-gray-900'
+                          ]">
+                    New ({{ newQuotes.length }})
+                  </button>
+                  <button @click="activeTab = 'responded'" 
+                          :class="[
+                            'px-3 py-1 rounded-full text-sm font-medium transition-colors',
+                            activeTab === 'responded' 
+                              ? 'bg-blue-100 text-blue-800' 
+                              : 'text-gray-600 hover:text-gray-900'
+                          ]">
+                    Responded ({{ respondedQuotes.length }})
+                  </button>
                 </div>
               </div>
             </div>
 
-            <!-- Responded Quotes -->
-            <div v-if="activeTab === 'responded'">
-              <div v-if="respondedQuotes.length === 0" class="p-8 text-center">
-                <CheckCircle class="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <h4 class="text-lg font-medium text-gray-900 mb-2">No responses yet</h4>
-                <p class="text-gray-600">Quotes you've responded to will appear here</p>
-              </div>
-              
-              <div v-for="quote in respondedQuotes" :key="quote.id" 
-                   class="p-6 hover:bg-gray-50 transition-colors">
-                <div class="flex justify-between items-start">
-                  <div>
-                    <h4 class="font-semibold text-gray-900">{{ quote.customerName }}</h4>
-                    <p class="text-sm text-gray-600">{{ quote.serviceType }}</p>
-                    <div class="flex items-center mt-1 text-xs text-gray-500">
-                      <Clock class="w-3 h-3 mr-1" />
-                      Responded {{ formatTimeAgo(quote.respondedAt) }}
-                    </div>
-                  </div>
-                  <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
-                    {{ quote.status }}
-                  </span>
+            <div class="divide-y divide-gray-200">
+              <!-- New Quote Requests -->
+              <div v-if="activeTab === 'new'">
+                <div v-if="newQuotes.length === 0" class="p-8 text-center">
+                  <Bell class="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                  <h4 class="text-lg font-medium text-gray-900 mb-2">No new requests</h4>
+                  <p class="text-gray-600">New quote requests will appear here</p>
                 </div>
                 
-                <div class="mt-4 p-3 bg-gray-50 rounded-lg">
-                  <p class="text-sm text-gray-700">{{ quote.response }}</p>
-                  <p class="text-sm font-medium text-gray-900 mt-2">Quote: {{ quote.quoteAmount }}</p>
+                <div v-for="quote in newQuotes" :key="quote.id" 
+                     class="p-6 hover:bg-gray-50 transition-colors">
+                  <div class="flex justify-between items-start mb-4">
+                    <div>
+                      <h4 class="font-semibold text-gray-900">{{ quote.customerName }}</h4>
+                      <p class="text-sm text-gray-600">{{ quote.serviceType }}</p>
+                      <div class="flex items-center mt-1 text-xs text-gray-500">
+                        <MapPin class="w-3 h-3 mr-1" />
+                        {{ quote.location }}
+                        <span class="mx-2">•</span>
+                        <Clock class="w-3 h-3 mr-1" />
+                        {{ formatTimeAgo(quote.submittedAt) }}
+                      </div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                      <span :class="[
+                        'px-2 py-1 rounded-full text-xs font-medium',
+                        quote.urgency === 'urgent' ? 'bg-red-100 text-red-800' :
+                        quote.urgency === 'soon' ? 'bg-yellow-100 text-yellow-800' :
+                        'bg-green-100 text-green-800'
+                      ]">
+                        {{ quote.urgency }}
+                      </span>
+                      <span class="text-xs text-gray-500">#{{ quote.referenceNumber }}</span>
+                    </div>
+                  </div>
+
+                  <p class="text-gray-700 mb-4 line-clamp-2">{{ quote.description }}</p>
+
+                  <!-- Photos -->
+                  <div v-if="quote.photos && quote.photos.length > 0" class="mb-4">
+                    <div class="flex space-x-2">
+                      <img v-for="(photo, index) in quote.photos.slice(0, 3)" 
+                           :key="index"
+                           :src="photo.preview" 
+                           :alt="`Photo ${index + 1}`"
+                           class="w-16 h-16 object-cover rounded-lg cursor-pointer hover:opacity-80 transition-opacity"
+                           @click="openPhotoModal(quote.photos, index)" />
+                      <div v-if="quote.photos.length > 3" 
+                           class="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center text-xs text-gray-600 cursor-pointer hover:bg-gray-200 transition-colors"
+                           @click="openPhotoModal(quote.photos, 3)">
+                        +{{ quote.photos.length - 3 }}
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Budget and Timeline -->
+                  <div class="flex items-center space-x-4 mb-4 text-sm text-gray-600">
+                    <div v-if="quote.budget" class="flex items-center">
+                      <DollarSign class="w-4 h-4 mr-1" />
+                      {{ formatBudget(quote.budget) }}
+                    </div>
+                    <div class="flex items-center">
+                      <Calendar class="w-4 h-4 mr-1" />
+                      {{ formatTimeline(quote.timeline) }}
+                    </div>
+                  </div>
+
+                  <!-- Contact Info -->
+                  <div class="flex items-center space-x-4 mb-4 text-sm text-gray-600">
+                    <span class="flex items-center">
+                      <Phone class="w-4 h-4 mr-1" />
+                      {{ quote.phone }}
+                    </span>
+                    <span class="flex items-center">
+                      <Mail class="w-4 h-4 mr-1" />
+                      {{ quote.email }}
+                    </span>
+                  </div>
+
+                  <!-- Action Buttons -->
+                  <div class="flex items-center space-x-3">
+                    <button @click="respondToQuote(quote)"
+                            class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                      Respond
+                    </button>
+                    <button @click="callCustomer(quote.phone)"
+                            class="p-2 text-gray-400 hover:text-green-600 transition-colors">
+                      <Phone class="w-5 h-5" />
+                    </button>
+                    <button @click="whatsappCustomer(quote)"
+                            class="p-2 text-gray-400 hover:text-green-600 transition-colors">
+                      <MessageCircle class="w-5 h-5" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Responded Quotes -->
+              <div v-if="activeTab === 'responded'">
+                <div v-if="respondedQuotes.length === 0" class="p-8 text-center">
+                  <CheckCircle class="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                  <h4 class="text-lg font-medium text-gray-900 mb-2">No responses yet</h4>
+                  <p class="text-gray-600">Quotes you've responded to will appear here</p>
+                </div>
+                
+                <div v-for="quote in respondedQuotes" :key="quote.id" 
+                     class="p-6 hover:bg-gray-50 transition-colors">
+                  <div class="flex justify-between items-start">
+                    <div>
+                      <h4 class="font-semibold text-gray-900">{{ quote.customerName }}</h4>
+                      <p class="text-sm text-gray-600">{{ quote.serviceType }}</p>
+                      <div class="flex items-center mt-1 text-xs text-gray-500">
+                        <Clock class="w-3 h-3 mr-1" />
+                        Responded {{ formatTimeAgo(quote.respondedAt) }}
+                      </div>
+                    </div>
+                    <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
+                      {{ quote.status }}
+                    </span>
+                  </div>
+                  
+                  <div class="mt-4 p-3 bg-gray-50 rounded-lg">
+                    <p class="text-sm text-gray-700">{{ quote.response }}</p>
+                    <p class="text-sm font-medium text-gray-900 mt-2">Quote: {{ quote.quoteAmount }}</p>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- Sidebar -->
-      <div class="space-y-6">
-        <!-- Quick Actions -->
-        <div class="bg-white rounded-lg shadow p-6">
-          <h3 class="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
-          <div class="space-y-3">
-            <button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg text-sm font-medium transition-colors flex items-center justify-center">
-              <Settings class="w-4 h-4 mr-2" />
-              Update Profile
-            </button>
-            <button class="w-full border border-gray-300 text-gray-700 py-2 px-4 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors flex items-center justify-center">
-              <Calendar class="w-4 h-4 mr-2" />
-              Set Availability
-            </button>
-            <button class="w-full border border-gray-300 text-gray-700 py-2 px-4 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors flex items-center justify-center">
-              <DollarSign class="w-4 h-4 mr-2" />
-              Update Pricing
-            </button>
-          </div>
-        </div>
-
-        <!-- Recent Activity -->
-        <div class="bg-white rounded-lg shadow p-6">
-          <h3 class="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
-          <div class="space-y-4">
-            <div v-for="activity in recentActivity" :key="activity.id" 
-                 class="flex items-start space-x-3">
-              <div :class="[
-                'w-2 h-2 rounded-full mt-2',
-                activity.type === 'new_quote' ? 'bg-blue-500' :
-                activity.type === 'response_sent' ? 'bg-green-500' :
-                'bg-yellow-500'
-              ]"></div>
-              <div class="flex-1 min-w-0">
-                <p class="text-sm text-gray-900">{{ activity.message }}</p>
-                <p class="text-xs text-gray-500">{{ formatTimeAgo(activity.timestamp) }}</p>
+        <!-- Sidebar -->
+        <div class="space-y-6">
+          <!-- Recent Activity -->
+          <div class="bg-white rounded-lg shadow p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
+            <div class="space-y-4">
+              <div v-for="activity in recentActivity" :key="activity.id" class="flex items-start">
+                <div :class="[
+                  'w-3 h-3 rounded-full mt-2 mr-3 flex-shrink-0',
+                  activity.type === 'new_quote' ? 'bg-blue-500' :
+                  activity.type === 'response_sent' ? 'bg-green-500' :
+                  'bg-yellow-500'
+                ]"></div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm text-gray-900">{{ activity.message }}</p>
+                  <p class="text-xs text-gray-500">{{ formatTimeAgo(activity.timestamp) }}</p>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <!-- Performance -->
-        <div class="bg-white rounded-lg shadow p-6">
-          <h3 class="text-lg font-semibold text-gray-900 mb-4">This Month</h3>
-          <div class="space-y-4">
-            <div class="flex justify-between items-center">
-              <span class="text-sm text-gray-600">Response Rate</span>
-              <span class="text-sm font-medium text-gray-900">{{ performance.responseRate }}%</span>
-            </div>
-            <div class="flex justify-between items-center">
-              <span class="text-sm text-gray-600">Avg Response Time</span>
-              <span class="text-sm font-medium text-gray-900">{{ performance.avgResponseTime }}</span>
-            </div>
-            <div class="flex justify-between items-center">
-              <span class="text-sm text-gray-600">Jobs Completed</span>
-              <span class="text-sm font-medium text-gray-900">{{ performance.jobsCompleted }}</span>
+          <!-- Performance -->
+          <div class="bg-white rounded-lg shadow p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">This Month</h3>
+            <div class="space-y-4">
+              <div class="flex justify-between items-center">
+                <span class="text-sm text-gray-600">Response Rate</span>
+                <span class="text-sm font-medium text-gray-900">{{ performance.responseRate }}%</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-sm text-gray-600">Avg Response Time</span>
+                <span class="text-sm font-medium text-gray-900">{{ performance.avgResponseTime }}</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-sm text-gray-600">Jobs Completed</span>
+                <span class="text-sm font-medium text-gray-900">{{ performance.jobsCompleted }}</span>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
+
+    <!-- Quote Response Modal -->
+    <QuoteResponseModal 
+      :is-open="showResponseModal"
+      :quote="selectedQuote"
+      @close="showResponseModal = false"
+      @submit="handleQuoteResponse"
+    />
+
+    <!-- Photo Viewer Modal -->
+    <PhotoViewerModal 
+      :is-open="showPhotoModal"
+      :photos="selectedPhotos"
+      :initial-index="selectedPhotoIndex"
+      @close="showPhotoModal = false"
+    />
   </div>
 </template>
 
@@ -292,9 +303,9 @@ import {
   CheckCircle, Settings
 } from 'lucide-vue-next'
 
-// Modal imports commented out until files are created
-// import QuoteResponseModal from '@/components/service-provider/QuoteResponseModal.vue'
-// import PhotoViewerModal from '@/components/service-provider/PhotoViewerModal.vue'
+// WORKING MODAL IMPORTS
+import QuoteResponseModal from '@/components/service-provider/QuoteResponseModal.vue'
+import PhotoViewerModal from '@/components/service-provider/PhotoViewerModal.vue'
 
 // Component state
 const activeTab = ref('new')
@@ -327,67 +338,62 @@ const quotes = ref([
     customerName: 'Sarah Johnson',
     serviceType: 'Home Wiring',
     location: 'Karen, Nairobi',
-    description: 'Need electrical wiring for a new extension. The room is about 4x5 meters and needs 4 power outlets, 2 light switches, and ceiling lighting.',
-    submittedAt: new Date('2025-07-20T10:30:00'),
-    phone: '+254701234567',
+    description: 'Need electrical wiring for a new extension. The room is about 4×5 meters and needs 4 power outlets, 2 light switches, and ceiling lighting.',
+    photos: [
+      { name: 'room_view.jpg', preview: 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=300&fit=crop' },
+      { name: 'electrical_panel.jpg', preview: 'https://images.unsplash.com/photo-1621905251918-48416bd8575a?w=400&h=300&fit=crop' },
+      { name: 'roof_view.jpg', preview: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=400&h=300&fit=crop' }
+    ],
+    urgency: 'soon',
+    submittedAt: new Date('2025-07-20T15:30:00'),
+    phone: '+254712345678',
     email: 'sarah.j@email.com',
-    contactPreference: 'phone',
     timeline: 'this_week',
     budget: '15k_50k',
-    urgency: 'soon',
-    referenceNumber: 'QR123456',
     status: 'new',
-    photos: [
-      { preview: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400', name: 'room_overview.jpg' },
-      { preview: 'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=400', name: 'wall_layout.jpg' }
-    ]
+    referenceNumber: 'QR123456'
   },
   {
     id: 2,
     customerName: 'David Kimani',
-    serviceType: 'Solar Installation',
+    serviceType: 'Socket Installation',
     location: 'Westlands, Nairobi',
-    description: 'Looking to install solar panels for a 3-bedroom house. Want to reduce electricity bills and have backup power during outages.',
-    submittedAt: new Date('2025-07-20T08:15:00'),
-    phone: '+254722345678',
-    email: 'david.k@email.com',
-    contactPreference: 'whatsapp',
-    timeline: 'within_month',
-    budget: 'over_100k',
-    urgency: 'flexible',
-    referenceNumber: 'QR123457',
-    status: 'new',
+    description: 'I need 3 additional power outlets installed in my living room. The room already has electrical wiring but I need more outlets for my home office setup.',
     photos: [
-      { preview: 'https://images.unsplash.com/photo-1509391366360-2e959784a276?w=400', name: 'roof_view.jpg' },
-      { preview: 'https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=400', name: 'electrical_panel.jpg' },
-      { preview: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400', name: 'house_front.jpg' }
-    ]
+      { name: 'living_room.jpg', preview: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=300&fit=crop' }
+    ],
+    urgency: 'normal',
+    submittedAt: new Date('2025-07-20T08:15:00'),
+    phone: '+254723456789',
+    email: 'david.k@email.com',
+    timeline: 'next_week',
+    budget: '5k_15k',
+    status: 'new',
+    referenceNumber: 'QR123457'
   },
   {
     id: 3,
     customerName: 'Grace Wanjiku',
     serviceType: 'Emergency Repair',
     location: 'Kilimani, Nairobi',
-    description: 'Power socket in kitchen is sparking and not working. Need urgent repair as it\'s a safety concern.',
+    description: 'Power outage in my apartment. The main breaker keeps tripping and I smell something burning. This is urgent and needs immediate attention.',
+    photos: [],
+    urgency: 'urgent',
     submittedAt: new Date('2025-07-20T14:45:00'),
-    phone: '+254733456789',
+    phone: '+254734567890',
     email: 'grace.w@email.com',
-    contactPreference: 'phone',
     timeline: 'asap',
     budget: 'under_5k',
-    urgency: 'urgent',
-    referenceNumber: 'QR123458',
     status: 'new',
-    photos: [
-      { preview: 'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=400', name: 'sparking_socket.jpg' }
-    ]
+    referenceNumber: 'QR123458'
   },
   {
     id: 4,
     customerName: 'Michael Ochieng',
-    serviceType: 'Socket Installation',
-    location: 'Langata, Nairobi',
-    description: 'Installed 3 additional power outlets in the living room. Customer was very satisfied with the work quality.',
+    serviceType: 'Electrical Maintenance',
+    location: 'Lavington, Nairobi',
+    description: 'Annual electrical maintenance check for my 3-bedroom house. Need inspection of all wiring, outlets, and electrical panel. Customer was very satisfied with the work quality.',
+    photos: [],
     submittedAt: new Date('2025-07-19T09:00:00'),
     respondedAt: new Date('2025-07-19T11:30:00'),
     phone: '+254744567890',
@@ -396,7 +402,8 @@ const quotes = ref([
     budget: '5k_15k',
     status: 'quoted',
     response: 'I can install 3 additional power outlets in your living room. The work will include running new cables, installing outlets, and testing. All materials and labor included.',
-    quoteAmount: 'KES 8,500'
+    quoteAmount: 'KES 8,500',
+    referenceNumber: 'QR123459'
   }
 ])
 
@@ -467,11 +474,35 @@ const formatTimeline = (timeline) => {
   return timelineMap[timeline] || timeline
 }
 
+// WORKING MODAL FUNCTIONS
 const respondToQuote = (quote) => {
-  // Temporarily show alert instead of modal
-  alert(`Would open response modal for ${quote.customerName}`)
-  // selectedQuote.value = quote
-  // showResponseModal.value = true
+  selectedQuote.value = quote
+  showResponseModal.value = true
+}
+
+const openPhotoModal = (photos, index) => {
+  selectedPhotos.value = photos
+  selectedPhotoIndex.value = index
+  showPhotoModal.value = true
+}
+
+const handleQuoteResponse = (responseData) => {
+  console.log('Quote response submitted:', responseData)
+  
+  // Update the quote status
+  const quoteIndex = quotes.value.findIndex(q => q.id === responseData.quoteId)
+  if (quoteIndex !== -1) {
+    quotes.value[quoteIndex].status = 'quoted'
+    quotes.value[quoteIndex].response = responseData.message
+    quotes.value[quoteIndex].quoteAmount = `KES ${responseData.amount}`
+    quotes.value[quoteIndex].respondedAt = new Date()
+  }
+  
+  // Close modal
+  showResponseModal.value = false
+  
+  // Show success message
+  alert('Quote response sent successfully!')
 }
 
 const callCustomer = (phone) => {
@@ -483,21 +514,8 @@ const whatsappCustomer = (quote) => {
   window.open(`https://wa.me/${quote.phone.replace('+', '')}?text=${message}`, '_blank')
 }
 
-const openPhotoModal = (photos, index) => {
-  // Temporarily show alert instead of modal
-  alert(`Would open photo viewer for ${photos[index].name}`)
-  // selectedPhotos.value = photos
-  // selectedPhotoIndex.value = index
-  // showPhotoModal.value = true
-}
-
-const handleQuoteResponse = (responseData) => {
-  // This will be implemented when modal is created
-  console.log('Quote response:', responseData)
-}
-
 onMounted(() => {
-  console.log('Dashboard loaded')
+  console.log('Dashboard loaded with working modals!')
 })
 </script>
 
