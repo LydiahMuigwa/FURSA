@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FURSA - Interactive Wireframes</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .wireframe-nav {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            padding: 10px 20px;
+            background: #fff;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background: #f0f0f0;
+        }
+
+        .nav-btn.active {
+            background: #2563eb;
+            color: white;
+            border-color: #2563eb;
+        }
+
+        .wireframe-container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .phone-frame {
+            width: 300px;
+            height: 600px;
+            background: white;
+            border-radius: 25px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border: 8px solid #333;
+            position: relative;
+            display: none;
+        }
+
+        .phone-frame.active {
+            display: block;
+        }
+
+        .phone-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .back-btn {
+            width: 30px;
+            height: 30px;
+            border: 2px solid #333;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .profile-pic {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #ddd;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+        }
+
+        .profile-name {
+            font-size: 20px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+
+        .profile-subtitle {
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .rating {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            margin-bottom: 20px;
+        }
+
+        .stars {
+            color: #ffc107;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .work-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .work-item {
+            aspect-ratio: 1;
+            background: #f0f0f0;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            font-size: 12px;
+        }
+
+        .upload-area {
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .upload-area:hover {
+            border-color: #2563eb;
+            background: #f8faff;
+        }
+
+        .upload-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+            color: #ddd;
+        }
+
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+        }
+
+        .btn-secondary {
+            background: #f3f4f6;
+            color: #374151;
+            padding: 8px 16px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .category-card {
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .category-card:hover {
+            border-color: #2563eb;
+            background: #f8faff;
+        }
+
+        .talent-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .talent-card {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .talent-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+        }
+
+        .talent-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #ddd;
+            margin: 0 auto 10px;
+        }
+
+        .talent-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .talent-skill {
+            color: #666;
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+
+        .talent-location {
+            color: #999;
+            font-size: 11px;
+        }
+
+        .search-bar {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
+        .search-bar:focus {
+            outline: none;
+            border-color: #2563eb;
+        }
+
+        .filter-chips {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .chip {
+            padding: 6px 12px;
+            background: #f3f4f6;
+            border-radius: 16px;
+            font-size: 12px;
+            color: #374151;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .chip:hover, .chip.active {
+            background: #2563eb;
+            color: white;
+        }
+
+        .progress-indicator {
+            text-align: center;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #2563eb;
+        }
+
+        .textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .contact-info {
+            background: #f8faff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .contact-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            background: #10b981;
+            color: white;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 500;
+        }
+
+        .description {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.4;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .wireframe-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .phone-frame {
+                width: 100%;
+                max-width: 350px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 style="text-align: center; margin-bottom: 30px; color: #333;">FURSA - Interactive Wireframes</h1>
+        
+        <div class="wireframe-nav">
+            <button class="nav-btn active" onclick="showWireframe('home')">Home/Discovery</button>
+            <button class="nav-btn" onclick="showWireframe('profile')">Talent Profile</button>
+            <button class="nav-btn" onclick="showWireframe('upload1')">Upload Flow - Step 1</button>
+            <button class="nav-btn" onclick="showWireframe('upload2')">Upload Flow - Step 2</button>
+            <button class="nav-btn" onclick="showWireframe('upload3')">Upload Flow - Step 3</button>
+            <button class="nav-btn" onclick="showWireframe('search')">Search & Filter</button>
+        </div>
+
+        <div class="wireframe-container">
+            
+            <!-- Home/Discovery Page -->
+            <div class="phone-frame active" id="home">
+                <div class="phone-header">
+                    <div class="logo">FURSA</div>
+                    <div style="font-size: 12px; color: #666;">🔍</div>
+                </div>
+                
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <h2 style="margin-bottom: 10px;">Give your voice to the world</h2>
+                    <p style="color: #666; font-size: 14px;">Discover amazing African talent</p>
+                </div>
+
+                <div class="category-grid">
+                    <div class="category-card">
+                        <div style="font-size: 24px; margin-bottom: 10px;">🎨</div>
+                        <div style="font-weight: bold;">Artisans</div>
+                    </div>
+                    <div class="category-card">
+                        <div style="font-size: 24px; margin-bottom: 10px;">✨</div>
+                        <div style="font-weight: bold;">Creatives</div>
+                    </div>
+                    <div class="category-card">
+                        <div style="font-size: 24px; margin-bottom: 10px;">🔧</div>
+                        <div style="font-weight: bold;">Skilled Trades</div>
+                    </div>
+                    <div class="category-card">
+                        <div style="font-size: 24px; margin-bottom: 10px;">🎓</div>
+                        <div style="font-weight: bold;">Students</div>
+                    </div>
+                </div>
+
+                <div class="talent-grid">
+                    <div class="talent-card">
+                        <div class="talent-avatar"></div>
+                        <div class="talent-name">Lydian Kamau</div>
+                        <div class="talent-skill">Beadwork Artist</div>
+                        <div class="talent-location">Nairobi, Kenya</div>
+                        <div style="margin-top: 8px;">
+                            <span class="stars">★★★★★</span>
+                            <span style="font-size: 12px; color: #666;">4.8</span>
+                        </div>
+                    </div>
+                    <div class="talent-card">
+                        <div class="talent-avatar"></div>
+                        <div class="talent-name">John Ochieng</div>
+                        <div class="talent-skill">Wood Carver</div>
+                        <div class="talent-location">Kisumu, Kenya</div>
+                        <div style="margin-top: 8px;">
+                            <span class="stars">★★★★☆</span>
+                            <span style="font-size: 12px; color: #666;">4.5</span>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn-primary" style="margin-top: 20px;">View All Talent</button>
+            </div>
+
+            <!-- Talent Profile -->
+            <div class="phone-frame" id="profile">
+                <div class="phone-header">
+                    <div class="back-btn">←</div>
+                    <div class="logo">FURSA</div>
+                    <div style="font-size: 12px; color: #666;">⋯</div>
+                </div>
+
+                <div class="profile-pic">👤</div>
+                <div class="profile-name">Lydian Kamau</div>
+                <div class="profile-subtitle">Beadwork Artist • Nairobi, Kenya</div>
+                <div class="badge">Verified</div>
+                
+                <div class="rating">
+                    <span class="stars">★★★★★</span>
+                    <span style="font-weight: bold;">4.8</span>
+                    <span style="color: #666;">(17 reviews)</span>
+                </div>
+
+                <div class="description">
+                    Handcrafted African beaded jewelry using traditional techniques passed down through generations. Specializing in custom designs for special occasions.
+                </div>
+
+                <div class="section-title">My Work</div>
+                <div class="work-grid">
+                    <div class="work-item">Necklace</div>
+                    <div class="work-item">Bracelet</div>
+                    <div class="work-item">Earrings</div>
+                    <div class="work-item">Anklet</div>
+                </div>
+
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <span>📱</span>
+                        <span>+254 712 345 678</span>
+                    </div>
+                    <div class="contact-item">
+                        <span>✉️</span>
+                        <span>lydian.kamau@email.com</span>
+                    </div>
+                    <div class="contact-item">
+                        <span>🌍</span>
+                        <span>Available for global shipping</span>
+                    </div>
+                </div>
+
+                <button class="btn-primary">Contact Artist</button>
+            </div>
+
+            <!-- Upload Flow Step 1 -->
+            <div class="phone-frame" id="upload1">
+                <div class="phone-header">
+                    <div class="back-btn">←</div>
+                    <div class="logo">FURSA</div>
+                    <div style="font-size: 12px; color: #666;">1 of 3</div>
+                </div>
+
+                <div class="progress-indicator">Step 1 of 3</div>
+                <div class="section-title">Basic Information</div>
+
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" class="form-input" placeholder="Enter your full name">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Your Skill/Craft</label>
+                    <input type="text" class="form-input" placeholder="e.g., Beadwork, Tailoring, Carpentry">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Location</label>
+                    <input type="text" class="form-input" placeholder="City, County, Country">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Phone Number</label>
+                    <input type="tel" class="form-input" placeholder="+254 712 345 678">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Brief Description</label>
+                    <textarea class="form-input textarea" placeholder="Tell us about your skills and experience..."></textarea>
+                </div>
+
+                <button class="btn-primary">Next</button>
+            </div>
+
+            <!-- Upload Flow Step 2 -->
+            <div class="phone-frame" id="upload2">
+                <div class="phone-header">
+                    <div class="back-btn">←</div>
+                    <div class="logo">FURSA</div>
+                    <div style="font-size: 12px; color: #666;">2 of 3</div>
+                </div>
+
+                <div class="progress-indicator">Step 2 of 3</div>
+                <div class="section-title">Add Photos/Videos of Your Work</div>
+
+                <div class="upload-area">
+                    <div class="upload-icon">📸</div>
+                    <div style="font-weight: bold; margin-bottom: 5px;">Upload Photos or Videos</div>
+                    <div style="color: #666; font-size: 12px;">Tap to add your best work</div>
+                </div>
+
+                <div class="work-grid">
+                    <div class="work-item">
+                        <div style="text-align: center;">
+                            <div style="font-size: 24px; margin-bottom: 5px;">+</div>
+                            <div style="font-size: 10px;">Add Photo</div>
+                        </div>
+                    </div>
+                    <div class="work-item">
+                        <div style="text-align: center;">
+                            <div style="font-size: 24px; margin-bottom: 5px;">+</div>
+                            <div style="font-size: 10px;">Add Video</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="background: #f8faff; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                    <div style="font-size: 12px; color: #666; margin-bottom: 10px;">💡 Tips for great photos:</div>
+                    <ul style="font-size: 12px; color: #666; margin-left: 15px;">
+                        <li>Use natural light</li>
+                        <li>Show your face with your work</li>
+                        <li>Include work in progress</li>
+                        <li>Add before/after shots</li>
+                    </ul>
+                </div>
+
+                <button class="btn-primary">Next</button>
+            </div>
+
+            <!-- Upload Flow Step 3 -->
+            <div class="phone-frame" id="upload3">
+                <div class="phone-header">
+                    <div class="back-btn">←</div>
+                    <div class="logo">FURSA</div>
+                    <div style="font-size: 12px; color: #666;">3 of 3</div>
+                </div>
+
+                <div class="progress-indicator">Step 3 of 3</div>
+                <div class="section-title">Voice Introduction</div>
+
+                <div style="background: #f8faff; padding: 20px; border-radius: 12px; text-align: center; margin-bottom: 20px;">
+                    <div style="font-size: 40px; margin-bottom: 10px;">🎤</div>
+                    <div style="font-weight: bold; margin-bottom: 10px;">Record Your Voice</div>
+                    <div style="color: #666; font-size: 14px; margin-bottom: 15px;">Tell the world about yourself in your own language</div>
+                    <button class="btn-secondary">🔴 Start Recording</button>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Language</label>
+                    <select class="form-input">
+                        <option>English</option>
+                        <option>Kiswahili</option>
+                        <option>Kikuyu</option>
+                        <option>Luo</option>
+                        <option>Other</option>
+                    </select>
+                </div>
+
+                <div style="background: #f8faff; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                    <div style="font-size: 12px; color: #666; margin-bottom: 10px;">💭 What to say (30-60 seconds):</div>
+                    <ul style="font-size: 12px; color: #666; margin-left: 15px;">
+                        <li>Your name and where you're from</li>
+                        <li>What you do and how long you've been doing it</li>
+                        <li>What makes your work special</li>
+                        <li>Your dreams and goals</li>
+                    </ul>
+                </div>
+
+                <button class="btn-primary">Complete Profile</button>
+            </div>
+
+            <!-- Search & Filter -->
+            <div class="phone-frame" id="search">
+                <div class="phone-header">
+                    <div class="back-btn">←</div>
+                    <div class="logo">FURSA</div>
+                    <div style="font-size: 12px; color: #666;">🔍</div>
+                </div>
+
+                <input type="text" class="search-bar" placeholder="Search for skills, names, or locations...">
+
+                <div class="filter-chips">
+                    <div class="chip active">All</div>
+                    <div class="chip">Artisans</div>
+                    <div class="chip">Creatives</div>
+                    <div class="chip">Trades</div>
+                    <div class="chip">Students</div>
+                </div>
+
+                <div class="filter-chips">
+                    <div class="chip">Kenya</div>
+                    <div class="chip">Nigeria</div>
+                    <div class="chip">Ghana</div>
+                    <div class="chip">Rwanda</div>
+                    <div class="chip">Uganda</div>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <div style="font-weight: bold;">247 talents found</div>
+                    <button class="btn-secondary">Sort by Rating</button>
+                </div>
+
+                <div class="talent-grid">
+                    <div class="talent-card">
+                        <div class="talent-avatar"></div>
+                        <div class="talent-name">Lydian Kamau</div>
+                        <div class="talent-skill">Beadwork Artist</div>
+                        <div class="talent-location">Nairobi, Kenya</div>
+                        <div style="margin-top: 8px;">
+                            <span class="stars">★★★★★</span>
+                            <span style="font-size: 12px; color: #666;">4.8</span>
+                        </div>
+                        <div class="badge" style="margin-top: 5px;">Verified</div>
+                    </div>
+                    <div class="talent-card">
+                        <div class="talent-avatar"></div>
+                        <div class="talent-name">Sarah Nyong</div>
+                        <div class="talent-skill">Fashion Designer</div>
+                        <div class="talent-location">Lagos, Nigeria</div>
+                        <div style="margin-top: 8px;">
+                            <span class="stars">★★★★☆</span>
+                            <span style="font-size: 12px; color: #666;">4.6</span>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn-primary">Load More</button>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function showWireframe(frameId) {
+            // Hide all frames
+            document.querySelectorAll('.phone-frame').forEach(frame => {
+                frame.classList.remove('active');
+            });
+            
+            // Remove active class from all buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show selected frame
+            document.getElementById(frameId).classList.add('active');
+            
+            // Add active class to clicked button
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>

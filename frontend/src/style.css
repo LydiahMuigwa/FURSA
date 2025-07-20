@@ -1,0 +1,39 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@theme {
+  --color-fursa-orange: #ff6b35;
+  --color-fursa-green: #10b981;
+  --color-fursa-blue: #2563eb;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: #f9fafb;
+}
+
+.btn-primary {
+  @apply bg-fursa-blue hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
+}
+
+.btn-secondary {
+  @apply bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 px-4 rounded-lg transition-colors duration-200 border border-gray-300;
+}
+
+.card {
+  @apply bg-white rounded-xl shadow-sm border border-gray-100 p-6 transition-shadow duration-200 hover:shadow-md;
+}
+
+.talent-card {
+  @apply bg-white rounded-xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-200 cursor-pointer transform hover:-translate-y-1;
+}
+
+.text-balance {
+  text-wrap: balance;
+}
+
+.form-input {
+  @apply w-full px-3 py-3 border border-gray-300 rounded-lg 
+         focus:ring-2 focus:ring-blue-500 focus:border-transparent 
+         transition-all focus:shadow-sm;
+}
