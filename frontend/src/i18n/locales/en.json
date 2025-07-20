@@ -1,3 +1,4 @@
+
 {
   "app": {
     "name": "FURSA",
@@ -16,8 +17,6 @@
     "join_creative": "Join as Creative Talent",
     "join_provider": "Join as Service Provider"
   },
-
-  
   "common": {
     "welcome": "Welcome",
     "back": "Back",
@@ -143,5 +142,80 @@
       "step3": "Schedule and complete the work",
       "performance_boost": "Performance Boost!"
     }
+  },
+  "stories": {
+    "cta": {
+      "title": "Share Your Professional Story",
+      "subtitle": "Show customers how you work, not just what you do. Build your visual portfolio today.",
+      "button": "Tell Your Story"
+    },
+    "builder": {
+      "title": "Tell Your Work Story",
+      "subtitle": "Show the world how you work, not just what you do"
+    },
+    "setup": {
+      "title": "What story do you want to tell?",
+      "subtitle": "Every great project has a story. Share yours.",
+      "story_title": "Story Title",
+      "title_placeholder": "e.g., Emergency Power Restoration in Kilimani",
+      "project_type": "What type of project was this?",
+      "intro": "How did this project start?",
+      "intro_placeholder": "e.g., The customer called me at 8pm during a thunderstorm. Their entire house had lost power and they had a newborn baby..."
+    },
+    "visual": {
+      "title": "Show your work process",
+      "subtitle": "Upload photos that tell the story from start to finish",
+      "before": "Before: The Challenge",
+      "before_placeholder": "Show the problem or initial state",
+      "process": "Process: How You Work",
+      "process_placeholder": "Show your tools, techniques, and problem-solving in action",
+      "after": "After: The Result",
+      "after_placeholder": "Show the completed work and happy customer"
+    },
+    "voice": {
+      "title": "Add your voice",
+      "subtitle": "Let customers hear your expertise and passion",
+      "record": "Record your explanation (optional)",
+      "start_recording": "Start Recording",
+      "record_tip": "Tip: Explain your approach, challenges you solved, or what makes you proud of this work",
+      "recording": "Recording...",
+      "stop": "Stop Recording"
+    },
+    "skills": {
+      "title": "What skills did this project showcase?"
+    },
+    "impact": {
+      "title": "What was the impact for the customer?",
+      "placeholder": "e.g., Family could safely stay in their home during the storm, baby stayed warm and comfortable..."
+    },
+    "preview": {
+      "title": "Your story preview",
+      "subtitle": "This is how your story will appear to customers"
+    },
+    "steps": {
+      "setup": "Setup",
+      "photos": "Photos", 
+      "voice": "Voice",
+      "preview": "Preview"
+    },
+    "upload": {
+  "drop_here": "Drop photos here!",
+  "drag_drop": "Drag & drop photos here",
+  "or_click": "or click to browse files",
+  "formats": "JPG, PNG, WEBP",
+  "max_size": "Max 5MB each",
+  "uploading": "Uploading...",
+  "add_more": "Add more",
+  "drag_more": "Drag more photos here or click add more button",
+  "photo": "photo",
+  "photos": "photos",
+  "max_photos": "max",
+  "invalid_format": "{name} is not a supported format",
+  "file_too_large": "{name} is too large",
+  "too_many_photos": "Maximum {max} photos allowed",
+  "processing_error": "Error processing {name}"
+},
+    "publish": "Publish Story",
+    "publishing": "Publishing..."
   }
 }

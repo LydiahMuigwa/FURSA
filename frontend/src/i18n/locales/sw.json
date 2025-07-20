@@ -1,10 +1,11 @@
+
 {
   "app": {
     "name": "FURSA",
     "tagline": "Talanta ya Kiafrika duniani"
   },
   "navigation": {
-     "home": "Nyumbani",
+    "home": "Nyumbani",
     "services": "Huduma",
     "talent": "Talanta za Ubunifu",
     "join_fursa": "Jiunge na FURSA",
@@ -141,5 +142,63 @@
       "step3": "Panga na ukamilishe kazi",
       "performance_boost": "Ongezeko la Utendakazi!"
     }
+  },
+  "stories": {
+    "cta": {
+      "title": "Shiriki Hadithi Yako ya Kitaaluma",
+      "subtitle": "Waonyeshe wateja jinsi unavyofanya kazi, si tu unachofanya. Jenga portfolio yako ya picha leo.",
+      "button": "Eleza Hadithi Yako"
+    },
+    "builder": {
+      "title": "Eleza Hadithi ya Kazi Yako",
+      "subtitle": "Onyesha ulimwengu jinsi unavyofanya kazi, si tu unachofanya"
+    },
+    "setup": {
+      "title": "Ni hadithi gani unayotaka kueleza?",
+      "subtitle": "Kila mradi mkuu una hadithi. Shiriki yako.",
+      "story_title": "Kichwa cha Hadithi",
+      "title_placeholder": "mfano, Kurekebishwa kwa Umeme wa Dharura Kilimani",
+      "project_type": "Ni aina gani ya mradi huu ulikuwa?",
+      "intro": "Mradi huu ulianzaje?",
+      "intro_placeholder": "mfano, Mteja alinipigia saa 2 jioni wakati wa dhoruba. Nyumba yao yote ilikuwa imepoteza umeme na walikuwa na mtoto mchanga..."
+    },
+    "visual": {
+      "title": "Onyesha mchakato wa kazi yako",
+      "subtitle": "Pakia picha zinazoweza kueleza hadithi kutoka mwanzo hadi mwisho",
+      "before": "Kabla: Changamoto",
+      "before_placeholder": "Onyesha tatizo au hali ya awali",
+      "process": "Mchakato: Jinsi Unavyofanya Kazi",
+      "process_placeholder": "Onyesha vifaa vyako, mbinu, na utatuzi wa matatizo",
+      "after": "Baada: Matokeo",
+      "after_placeholder": "Onyesha kazi iliyokamilika na mteja aliyefurahi"
+    },
+    "voice": {
+      "title": "Ongeza sauti yako",
+      "subtitle": "Waache wateja wasikie ujuzi na shauku yako",
+      "record": "Rekodi maelezo yako (si lazima)",
+      "start_recording": "Anza Kurekodi",
+      "record_tip": "Dokezo: Eleza mbinu yako, changamoto ulizosuluhisha, au kinachokufanya ujivunie kazi hii",
+      "recording": "Inarekodi...",
+      "stop": "Acha Kurekodi"
+    },
+    "skills": {
+      "title": "Ni ujuzi gani mradi huu ulioonyesha?"
+    },
+    "impact": {
+      "title": "Ni athari gani ilikuwa kwa mteja?",
+      "placeholder": "mfano, Familia iliweza kukaa nyumbani kwa usalama wakati wa dhoruba, mtoto alibaki joto na starehe..."
+    },
+    "preview": {
+      "title": "Onyesho la hadithi yako",
+      "subtitle": "Hii ni jinsi hadithi yako itakavyoonekana kwa wateja"
+    },
+    "steps": {
+      "setup": "Mipangilio",
+      "photos": "Picha",
+      "voice": "Sauti", 
+      "preview": "Onyesho"
+    },
+    "publish": "Chapisha Hadithi",
+    "publishing": "Inachapisha..."
   }
 }

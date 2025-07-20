@@ -195,6 +195,12 @@ const router = createRouter({
       path: '/carpenter',
       redirect: '/app/services/carpenter'
     },
+
+    {
+  path: '/app/provider/story-builder',
+  name: 'WorkStoryBuilder', 
+  component: () => import('@/components/service-provider/stories/WorkStoryBuilder.vue')
+},
     
     // 404 Catch-all route
     {
