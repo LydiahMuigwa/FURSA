@@ -107,20 +107,31 @@ const router = createRouter({
             title: 'Provider Dashboard - FURSA',
             requiresAuth: true // This would require provider authentication
           }
+        }, // ← ADDED MISSING COMMA
+
+        // Service Provider Onboarding
+        {
+          path: 'join-as-provider',
+          name: 'provider-join',
+          component: () => import('../views/ServiceProviderOnboarding.vue'),
+          meta: {
+            title: 'Join as Service Provider - FURSA'
+          }
+        }, // ← ADDED MISSING COMMA
+
+        // Work Story Builder
+        {
+          path: 'provider/story-builder',
+          name: 'WorkStoryBuilder', 
+          component: () => import('@/components/service-provider/stories/WorkStoryBuilder.vue'),
+          meta: {
+            title: 'Tell Your Work Story - FURSA',
+            requiresAuth: true
+          }
         }
 
         // === COMMENTED OUT UNTIL COMPONENTS ARE CREATED ===
         
-        // Service Provider Onboarding (commented out until file is created)
-        // {
-        //   path: 'join-as-provider',
-        //   name: 'provider-join',
-        //   component: () => import('../views/ServiceProviderOnboarding.vue'),
-        //   meta: {
-        //     title: 'Join as Service Provider - FURSA'
-        //   }
-        // },
-
         // Quote Request Page (optional - could be modal instead)
         // {
         //   path: 'request-quote/:providerId',
@@ -195,12 +206,6 @@ const router = createRouter({
       path: '/carpenter',
       redirect: '/app/services/carpenter'
     },
-
-    {
-  path: '/app/provider/story-builder',
-  name: 'WorkStoryBuilder', 
-  component: () => import('@/components/service-provider/stories/WorkStoryBuilder.vue')
-},
     
     // 404 Catch-all route
     {
@@ -279,12 +284,12 @@ export const navigationHelpers = {
   // New helper for provider dashboard
   goToProviderDashboard() {
     return router.push({ name: 'provider-dashboard' })
-  }
+  }, 
 
-  // Helper for provider onboarding (commented out until route is uncommented)
-  // goToProviderOnboarding() {
-  //   return router.push({ name: 'provider-join' })
-  // }
+  // Helper for provider onboarding
+  goToProviderOnboarding() {
+    return router.push({ name: 'provider-join' })
+  }
 }
 
 export default router
