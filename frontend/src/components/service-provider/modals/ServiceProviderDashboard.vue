@@ -672,6 +672,20 @@ onMounted(() => {
   if (savedLanguage) {
     locale.value = savedLanguage
   }
+  
+  // Check for story published success
+  const urlParams = new URLSearchParams(window.location.search)
+  if (urlParams.get('story') === 'published') {
+    // Show success notification
+    console.log('🎉 Story published successfully!')
+    // You could add a toast notification here
+    
+    // Clean up URL
+    const url = new URL(window.location)
+    url.searchParams.delete('story')
+    window.history.replaceState({}, '', url)
+  }
+  
   console.log('Dashboard loaded with working language selector!')
 })
 </script>
