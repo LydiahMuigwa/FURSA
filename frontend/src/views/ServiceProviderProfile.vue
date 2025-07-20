@@ -1,4 +1,4 @@
-<!-- ServiceProviderProfile.vue - Full service provider profile page -->
+<!-- ServiceProviderProfile.vue - Updated with enhanced quote system -->
 <template>
   <div class="min-h-screen bg-gray-50">
     <!-- Header Section -->
@@ -107,34 +107,39 @@
             </div>
           </div>
 
-          <!-- Contact Sidebar -->
+          <!-- Enhanced Contact Sidebar -->
           <div class="lg:w-80">
             <div class="bg-white border border-gray-200 rounded-xl p-6 sticky top-6">
               <h3 class="text-lg font-semibold mb-4">Get in Touch</h3>
               
-              <!-- Quick Contact -->
+              <!-- Enhanced Contact Options -->
               <div class="space-y-3 mb-6">
+                <!-- Primary CTA - Request Quote -->
                 <button 
-                  @click="callProvider"
-                  class="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3 px-4 rounded-lg font-medium transition-colors flex items-center justify-center"
-                >
-                  <Phone class="w-4 h-4 mr-2" />
-                  Call Now
-                </button>
-                <button 
-                  @click="whatsappProvider"
-                  class="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-lg font-medium transition-colors flex items-center justify-center"
-                >
-                  <MessageCircle class="w-4 h-4 mr-2" />
-                  WhatsApp
-                </button>
-                <button 
-                  @click="showQuoteForm = true"
-                  class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg font-medium transition-colors flex items-center justify-center"
+                  @click="openQuoteModal"
+                  class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg font-medium transition-all transform hover:scale-105 flex items-center justify-center"
                 >
                   <FileText class="w-4 h-4 mr-2" />
-                  Request Quote
+                  Request Detailed Quote
                 </button>
+                
+                <!-- Quick Contact Options -->
+                <div class="grid grid-cols-2 gap-3">
+                  <button 
+                    @click="callProvider"
+                    class="bg-emerald-600 hover:bg-emerald-700 text-white py-3 px-4 rounded-lg font-medium transition-colors flex items-center justify-center"
+                  >
+                    <Phone class="w-4 h-4 mr-2" />
+                    Call
+                  </button>
+                  <button 
+                    @click="whatsappProvider"
+                    class="bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-lg font-medium transition-colors flex items-center justify-center"
+                  >
+                    <MessageCircle class="w-4 h-4 mr-2" />
+                    WhatsApp
+                  </button>
+                </div>
               </div>
 
               <!-- Response Time -->
@@ -162,6 +167,20 @@
                   <Shield class="w-4 h-4 text-emerald-500" />
                 </div>
               </div>
+
+              <!-- Recent Activity -->
+              <div class="mt-6 pt-4 border-t border-gray-200">
+                <div class="text-sm text-gray-600">
+                  <div class="flex items-center mb-2">
+                    <div class="w-2 h-2 bg-emerald-500 rounded-full mr-2"></div>
+                    <span>Last active: {{ getLastActiveTime() }}</span>
+                  </div>
+                  <div class="flex items-center">
+                    <Star class="w-3 h-3 text-yellow-400 mr-2" />
+                    <span>{{ getRecentReviews() }} recent reviews</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -174,7 +193,7 @@
         <h2 class="text-2xl font-bold text-gray-900 mb-6">Services & Pricing</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <div v-for="service in provider.services" :key="service.name"
-               class="bg-white rounded-xl border border-gray-200 p-6">
+               class="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-md transition-shadow">
             <div class="flex items-start justify-between mb-4">
               <div>
                 <h3 class="font-semibold text-gray-900 mb-2">{{ service.name }}</h3>
@@ -187,7 +206,9 @@
             </div>
             <div class="flex items-center justify-between text-sm">
               <span class="text-gray-500">Duration: {{ service.duration }}</span>
-              <button class="text-blue-600 hover:text-blue-700 font-medium">Get Quote</button>
+              <button @click="openQuoteModal" class="text-blue-600 hover:text-blue-700 font-medium">
+                Get Quote
+              </button>
             </div>
           </div>
         </div>
@@ -269,86 +290,51 @@
       </div>
     </section>
 
-    <!-- Quote Request Modal -->
-    <div v-if="showQuoteForm" @click="showQuoteForm = false"
-         class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div @click.stop class="bg-white rounded-xl max-w-md w-full p-6">
-        <div class="flex justify-between items-center mb-4">
-          <h3 class="text-lg font-semibold">Request Quote</h3>
-          <button @click="showQuoteForm = false">
-            <X class="w-5 h-5" />
-          </button>
-        </div>
-        
-        <form @submit.prevent="submitQuoteRequest" class="space-y-4">
-          <div>
-            <label class="block text-sm font-medium mb-2">Service Needed</label>
-            <select v-model="quoteForm.service" class="w-full p-3 border border-gray-300 rounded-lg">
-              <option v-for="service in provider.services" :key="service.name" :value="service.name">
-                {{ service.name }}
-              </option>
-            </select>
-          </div>
-          
-          <div>
-            <label class="block text-sm font-medium mb-2">Description</label>
-            <textarea v-model="quoteForm.description" 
-                      class="w-full p-3 border border-gray-300 rounded-lg h-24 resize-none"
-                      placeholder="Describe what you need done..."></textarea>
-          </div>
-          
-          <div>
-            <label class="block text-sm font-medium mb-2">Your Location</label>
-            <input v-model="quoteForm.location" type="text" 
-                   class="w-full p-3 border border-gray-300 rounded-lg"
-                   placeholder="Enter your address" />
-          </div>
-          
-          <div>
-            <label class="block text-sm font-medium mb-2">Phone Number</label>
-            <input v-model="quoteForm.phone" type="tel" 
-                   class="w-full p-3 border border-gray-300 rounded-lg"
-                   placeholder="+254 712 345 678" />
-          </div>
-          
-          <div>
-            <label class="block text-sm font-medium mb-2">Preferred Timeline</label>
-            <select v-model="quoteForm.timeline" class="w-full p-3 border border-gray-300 rounded-lg">
-              <option value="asap">As soon as possible</option>
-              <option value="today">Today</option>
-              <option value="tomorrow">Tomorrow</option>
-              <option value="this_week">This week</option>
-              <option value="next_week">Next week</option>
-              <option value="flexible">I'm flexible</option>
-            </select>
-          </div>
-          
-          <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg font-medium transition-colors">
-            Send Quote Request
-          </button>
-        </form>
-      </div>
-    </div>
+    <!-- Enhanced Quote Request Modal -->
+    <QuoteRequestModal 
+      :is-open="showQuoteModal" 
+      :provider="provider"
+      @close="showQuoteModal = false"
+      @submit="handleQuoteSubmit"
+    />
+
+    <!-- Contact Success Modal -->
+    <ContactSuccessModal 
+      :is-open="showSuccessModal"
+      :provider-name="provider.name"
+      :response-time="provider.responseTime"
+      :contact-method="lastContactMethod"
+      :provider-contact="provider.contact"
+      :reference-number="quoteReferenceNumber"
+      @close="showSuccessModal = false"
+    />
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { 
   User, Check, MapPin, Star, Phone, MessageCircle, FileText, Clock, 
-  Shield, Image, X 
+  Shield, Image 
 } from 'lucide-vue-next'
+import QuoteRequestModal from '@/components/service-provider/QuoteRequestModal.vue'
+import ContactSuccessModal from '@/components/service-provider/ContactSuccessModal.vue'
 
 const route = useRoute()
-const showQuoteForm = ref(false)
 
-// Sample provider data - replace with API call
+// Component state
+const showQuoteModal = ref(false)
+const showSuccessModal = ref(false)
+const lastContactMethod = ref('phone')
+const quoteReferenceNumber = ref('')
+
+// Sample provider data (replace with API call)
 const provider = ref({
   id: route.params.id,
   name: 'John Mwangi',
   serviceType: 'Licensed Electrician',
-  location: 'Nairobi, Kenya',
+  location: 'Westlands, Nairobi',
   serviceRadius: 15,
   profileImage: null,
   verified: true,
@@ -361,7 +347,7 @@ const provider = ref({
   completedJobs: 156,
   responseTime: '2 hours',
   availability: {
-    status: 'available', // available, busy, unavailable
+    status: 'available',
     message: 'Available today'
   },
   description: 'Professional electrician with 10+ years of experience in residential and commercial electrical work. Specializing in solar installations, home wiring, and emergency repairs. Licensed, insured, and committed to safety and quality.',
@@ -429,35 +415,87 @@ const provider = ref({
   }
 })
 
-const quoteForm = ref({
-  service: '',
-  description: '',
-  location: '',
-  phone: '',
-  timeline: 'asap'
-})
+// Computed properties
+const getLastActiveTime = () => {
+  return provider.value.isOnline ? 'Online now' : '2 hours ago'
+}
+
+const getRecentReviews = () => {
+  const recentCount = provider.value.recentReviews.filter(review => 
+    review.date.includes('week') || review.date.includes('day')
+  ).length
+  return recentCount
+}
 
 // Methods
+const openQuoteModal = () => {
+  showQuoteModal.value = true
+}
+
 const callProvider = () => {
   window.location.href = `tel:${provider.value.contact.phone}`
+  lastContactMethod.value = 'phone'
 }
 
 const whatsappProvider = () => {
   const message = encodeURIComponent(`Hi ${provider.value.name}, I found you on FURSA and would like to discuss a ${provider.value.serviceType} project.`)
   window.open(`https://wa.me/${provider.value.contact.whatsapp.replace('+', '')}?text=${message}`, '_blank')
+  lastContactMethod.value = 'whatsapp'
 }
 
 const openWorkModal = (work) => {
-  // Open work detail modal
   console.log('Opening work modal for:', work.title)
 }
 
-const submitQuoteRequest = () => {
-  // Submit quote request
-  console.log('Submitting quote request:', quoteForm.value)
-  showQuoteForm.value = false
-  // Show success message
-  alert('Quote request sent! John will contact you soon.')
+const handleQuoteSubmit = async (quoteRequest) => {
+  try {
+    // Generate reference number
+    quoteReferenceNumber.value = 'QR' + Date.now().toString().slice(-6)
+    
+    // Store the contact method preference
+    lastContactMethod.value = quoteRequest.contactPreference
+    
+    // Here you would send to your backend API
+    console.log('Quote request submitted:', {
+      ...quoteRequest,
+      referenceNumber: quoteReferenceNumber.value
+    })
+    
+    // For now, just show success modal
+    showSuccessModal.value = true
+    
+    // You could also send email notifications here
+    await sendQuoteNotification(quoteRequest)
+    
+  } catch (error) {
+    console.error('Error processing quote request:', error)
+    alert('There was an error processing your request. Please try again.')
+  }
+}
+
+const sendQuoteNotification = async (quoteRequest) => {
+  // This would integrate with your email service
+  // For now, just log what would be sent
+  console.log('Would send email notification:', {
+    to: provider.value.contact.email,
+    subject: `New Quote Request from ${quoteRequest.customerName}`,
+    template: 'quote-request',
+    data: {
+      providerName: provider.value.name,
+      customerName: quoteRequest.customerName,
+      serviceType: quoteRequest.serviceType,
+      description: quoteRequest.description,
+      location: quoteRequest.location,
+      timeline: quoteRequest.timeline,
+      budget: quoteRequest.budget,
+      contactInfo: {
+        phone: quoteRequest.phone,
+        email: quoteRequest.email,
+        preference: quoteRequest.contactPreference
+      },
+      referenceNumber: quoteReferenceNumber.value
+    }
+  })
 }
 
 onMounted(() => {
@@ -467,7 +505,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* Custom styles for service provider profile */
 .aspect-square {
   aspect-ratio: 1 / 1;
 }

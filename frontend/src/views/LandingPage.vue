@@ -1,72 +1,174 @@
+<!-- LandingPage.vue - Updated to use shared navigation -->
 <template>
   <div class="min-h-screen bg-gray-50">
-    <!-- Navigation -->
-    <nav class="bg-white shadow-sm sticky top-0 z-50">
+    <!-- Shared Navigation -->
+    <SharedNavigation variant="landing" />
+
+    <!-- Hero Section - Dual Purpose -->
+    <section class="bg-gradient-to-r from-purple-600 to-blue-600 text-white py-20">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between items-center h-16">
-          <div class="flex items-center">
-            <!-- FURSA Logo with Cultural Pattern -->
-            <div class="flex items-center">
-              <div class="cultural-pattern mr-3">
-                <div class="pattern-bar-1"></div>
-                <div class="pattern-bar-2"></div>
-                <div class="pattern-bar-3"></div>
-                <div class="pattern-bar-4"></div>
-              </div>
-              <div>
-                <h1 class="text-2xl font-bold text-gray-900">FURSA</h1>
-                <span class="text-sm text-gray-600 hidden lg:block">Connecting African talent to global opportunities</span>
-              </div>
+        <div class="text-center mb-12">
+          <!-- Hero Logo -->
+          <div class="flex items-center justify-center mb-8">
+            <div class="cultural-pattern-lg mr-6 cultural-fade">
+              <div class="pattern-bar-lg-white-1"></div>
+              <div class="pattern-bar-lg-white-2"></div>
+              <div class="pattern-bar-lg-white-3"></div>
+              <div class="pattern-bar-lg-white-4"></div>
+            </div>
+            <div>
+              <h1 class="text-4xl font-bold">FURSA</h1>
+              <p class="text-lg opacity-90">Connecting African talent to global opportunities</p>
             </div>
           </div>
-          <div class="hidden md:flex items-center space-x-8">
-            <a href="#features" class="text-gray-700 hover:text-blue-600 transition-colors">Features</a>
-            <a href="#talent" class="text-gray-700 hover:text-blue-600 transition-colors">For Talent</a>
-            <a href="#clients" class="text-gray-700 hover:text-blue-600 transition-colors">For Clients</a>
-            <button @click="goToApp" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
-              Browse Talent
-            </button>
+          
+          <h2 class="text-5xl font-bold mb-6 leading-tight">
+            Your Gateway to 
+            <span class="text-yellow-300">African Excellence</span>
+          </h2>
+          <p class="text-xl mb-8 opacity-90 max-w-4xl mx-auto">
+            Whether you need local services or want to discover creative talent, FURSA connects you directly with verified African professionals. No middleman, authentic connections.
+          </p>
+        </div>
+
+        <!-- Dual CTA Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
+          <!-- Service Providers -->
+          <div class="bg-white/10 backdrop-blur-sm rounded-xl p-8 text-center">
+            <div class="text-4xl mb-4">🔧</div>
+            <h3 class="text-2xl font-bold mb-4">Need Local Services?</h3>
+            <p class="text-lg opacity-90 mb-6">
+              Find trusted electricians, plumbers, carpenters, cleaners and more in your area. GPS-enabled, verified professionals.
+            </p>
+            <div class="space-y-3">
+              <button @click="goToServices" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-3 rounded-lg font-semibold transition-all transform hover:scale-105">
+                🗺️ Find Services Near Me
+              </button>
+              <button @click="goToProviderJoin" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
+                💼 Join as Service Provider
+              </button>
+            </div>
           </div>
-          <!-- Mobile menu button -->
-          <button @click="goToApp" class="md:hidden bg-blue-600 text-white px-4 py-2 rounded-lg">
-            Enter App
+
+          <!-- Creative Talent -->
+          <div class="bg-white/10 backdrop-blur-sm rounded-xl p-8 text-center">
+            <div class="text-4xl mb-4">🎨</div>
+            <h3 class="text-2xl font-bold mb-4">Discover Creative Talent</h3>
+            <p class="text-lg opacity-90 mb-6">
+              Connect with authentic African artists, crafters, designers and creatives through visual portfolios and voice introductions.
+            </p>
+            <div class="space-y-3">
+              <button @click="goToTalentBrowse" class="w-full bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg font-semibold transition-all transform hover:scale-105">
+                🔍 Browse Creative Talent
+              </button>
+              <button @click="goToTalentUpload" class="w-full bg-orange-700 hover:bg-orange-800 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
+                🎨 Create Your Portfolio
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Quick Services Section -->
+    <section id="services" class="py-16 bg-white">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl font-bold text-gray-900 mb-4">Popular Services Near You</h2>
+          <p class="text-xl text-gray-600">Get help from verified local professionals</p>
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+          <button 
+            v-for="service in popularServices" 
+            :key="service.name"
+            @click="goToServiceCategory(service.slug)"
+            class="flex flex-col items-center p-6 bg-gray-50 hover:bg-gray-100 rounded-xl transition-all hover:shadow-md group"
+          >
+            <div class="text-3xl mb-3 group-hover:scale-110 transition-transform">{{ service.icon }}</div>
+            <h3 class="font-semibold text-gray-900 text-center">{{ service.name }}</h3>
+            <p class="text-sm text-gray-600 text-center mt-1">{{ service.desc }}</p>
+          </button>
+        </div>
+        <div class="text-center mt-8">
+          <button @click="goToServices" class="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors">
+            View All Services
           </button>
         </div>
       </div>
-    </nav>
+    </section>
 
-    <!-- Hero Section -->
-    <section class="bg-gradient-to-r from-purple-600 to-blue-600 text-white py-20">
+    <!-- Features Section -->
+    <section id="how-it-works" class="py-20 bg-gray-50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+          <h2 class="text-4xl font-bold text-gray-900 mb-4">How FURSA Works</h2>
+          <p class="text-xl text-gray-600">Simple, direct, authentic connections</p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div class="text-center p-6">
+            <div class="w-16 h-16 bg-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4">
+              <MapPin class="w-8 h-8 text-white" />
+            </div>
+            <h3 class="font-semibold text-lg mb-2">Find Near You</h3>
+            <p class="text-gray-600">Use GPS to find services and talent in your area with real distance calculations</p>
+          </div>
+          <div class="text-center p-6">
+            <div class="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Check class="w-8 h-8 text-white" />
+            </div>
+            <h3 class="font-semibold text-lg mb-2">Verified Profiles</h3>
+            <p class="text-gray-600">All service providers and talent are verified with background checks and reviews</p>
+          </div>
+          <div class="text-center p-6">
+            <div class="w-16 h-16 bg-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Phone class="w-8 h-8 text-white" />
+            </div>
+            <h3 class="font-semibold text-lg mb-2">Direct Contact</h3>
+            <p class="text-gray-600">Call, WhatsApp, or request quotes directly. No platform fees or middleman</p>
+          </div>
+          <div class="text-center p-6">
+            <div class="w-16 h-16 bg-purple-500 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Heart class="w-8 h-8 text-white" />
+            </div>
+            <h3 class="font-semibold text-lg mb-2">Authentic Stories</h3>
+            <p class="text-gray-600">Voice introductions and visual portfolios showcase real work and personality</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Creative Talent Section -->
+    <section id="talent" class="py-20 bg-white">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div>
-            <!-- Hero Logo -->
-            <div class="flex items-center mb-8">
-              <div class="cultural-pattern-lg mr-6 cultural-fade">
-                <div class="pattern-bar-lg-white-1"></div>
-                <div class="pattern-bar-lg-white-2"></div>
-                <div class="pattern-bar-lg-white-3"></div>
-                <div class="pattern-bar-lg-white-4"></div>
+            <h2 class="text-4xl font-bold text-gray-900 mb-6">
+              Discover Authentic African 
+              <span class="text-orange-600">Creative Talent</span>
+            </h2>
+            <p class="text-xl text-gray-600 mb-8">
+              Connect directly with African artists, craftspeople, designers, and creatives. See their work, hear their stories, and commission authentic pieces that celebrate African heritage.
+            </p>
+            <div class="space-y-4">
+              <div class="flex items-center">
+                <Mic class="w-6 h-6 text-orange-500 mr-3" />
+                <span class="text-gray-700">Voice introductions in multiple African languages</span>
               </div>
-              <div>
-                <h1 class="text-4xl font-bold">FURSA</h1>
-                <p class="text-lg opacity-90">Connecting African talent to global opportunities</p>
+              <div class="flex items-center">
+                <Camera class="w-6 h-6 text-orange-500 mr-3" />
+                <span class="text-gray-700">Visual portfolios showing real work and process</span>
+              </div>
+              <div class="flex items-center">
+                <Globe class="w-6 h-6 text-orange-500 mr-3" />
+                <span class="text-gray-700">Global shipping and digital collaboration</span>
               </div>
             </div>
-            
-            <h2 class="text-5xl font-bold mb-6 leading-tight">
-              Connecting African Talent to 
-              <span class="text-yellow-300">Global Opportunities</span>
-            </h2>
-            <p class="text-xl mb-8 opacity-90">
-              Discover authentic African artisans, creatives, and skilled workers through visual portfolios and voice introductions. Direct connections, verified profiles, no middleman.
-            </p>
-            <div class="flex flex-col sm:flex-row gap-4">
-              <button @click="goToUpload" class="bg-orange-500 hover:bg-orange-600 text-white px-8 py-4 rounded-lg font-semibold text-lg transition-all transform hover:scale-105">
-                🎨 Create Your Portfolio
+            <div class="mt-8 space-x-4">
+              <button @click="goToTalentBrowse" class="bg-orange-600 hover:bg-orange-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
+                Browse Creative Talent
               </button>
-              <button @click="goToSearch" class="bg-white text-gray-900 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-100 transition-colors">
-                🔍 Find Talent
+              <button @click="goToTalentUpload" class="border border-orange-600 text-orange-600 hover:bg-orange-50 px-6 py-3 rounded-lg font-semibold transition-colors">
+                Join as Creative
               </button>
             </div>
           </div>
@@ -74,8 +176,8 @@
             <!-- Sample talent card preview -->
             <div class="bg-white rounded-xl p-6 shadow-2xl max-w-md mx-auto">
               <div class="flex items-center mb-4">
-                <div class="w-12 h-12 bg-gray-200 rounded-full mr-3 flex items-center justify-center">
-                  <User class="w-6 h-6 text-gray-500" />
+                <div class="w-12 h-12 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full mr-3 flex items-center justify-center">
+                  <User class="w-6 h-6 text-white" />
                 </div>
                 <div>
                   <h3 class="font-semibold text-gray-900">Amara Diallo</h3>
@@ -92,7 +194,7 @@
                   <span class="text-yellow-500">★★★★★</span>
                   <span class="text-sm text-gray-600 ml-2">4.9 (23 reviews)</span>
                 </div>
-                <button class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm">Contact</button>
+                <button class="bg-orange-600 text-white px-4 py-2 rounded-lg text-sm">Contact</button>
               </div>
             </div>
           </div>
@@ -100,87 +202,26 @@
       </div>
     </section>
 
-    <!-- Features Section -->
-    <section id="features" class="py-20 bg-white">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center mb-16">
-          <h2 class="text-4xl font-bold text-gray-900 mb-4">Why FURSA is Different</h2>
-          <p class="text-xl text-gray-600">Authentic connections through innovative features</p>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          <div class="text-center p-6">
-            <div class="w-16 h-16 bg-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Mic class="w-8 h-8 text-white" />
-            </div>
-            <h3 class="font-semibold text-lg mb-2">Voice Introductions</h3>
-            <p class="text-gray-600">Hear talent speak in their own language with translation options</p>
-          </div>
-          <div class="text-center p-6">
-            <div class="w-16 h-16 bg-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Camera class="w-8 h-8 text-white" />
-            </div>
-            <h3 class="font-semibold text-lg mb-2">Visual Portfolios</h3>
-            <p class="text-gray-600">See real work, not just CVs. Photos and videos of actual projects</p>
-          </div>
-          <div class="text-center p-6">
-            <div class="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Check class="w-8 h-8 text-white" />
-            </div>
-            <h3 class="font-semibold text-lg mb-2">Verified Profiles</h3>
-            <p class="text-gray-600">Trust through verification while welcoming emerging talent</p>
-          </div>
-          <div class="text-center p-6">
-            <div class="w-16 h-16 bg-purple-500 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Heart class="w-8 h-8 text-white" />
-            </div>
-            <h3 class="font-semibold text-lg mb-2">Direct Connection</h3>
-            <p class="text-gray-600">No middleman. Connect directly with talent and clients</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Cultural Heritage Section -->
-    <section class="py-20 bg-orange-50">
-      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <div class="flex items-center justify-center mb-8">
-          <div class="cultural-pattern-lg mr-6">
-            <div class="pattern-bar-1"></div>
-            <div class="pattern-bar-2"></div>
-            <div class="pattern-bar-3"></div>
-            <div class="pattern-bar-4"></div>
-          </div>
-          <h2 class="text-4xl font-bold text-gray-900">🎨 Celebrating African Heritage</h2>
-        </div>
-        <p class="text-xl text-gray-700 mb-6">
-          Our cultural pattern represents the <strong>rich layers of African creativity</strong> - from traditional heritage 
-          to modern innovation. Each element symbolizes a different aspect of talent: 
-          <span class="text-orange-600 font-medium">Heritage</span>, 
-          <span class="text-yellow-600 font-medium">Craft</span>, 
-          <span class="text-emerald-600 font-medium">Growth</span>, and 
-          <span class="text-blue-600 font-medium">Global Reach</span>.
-        </p>
-        <p class="text-gray-600">
-          The flowing, overlapping design reflects traditional African textile patterns 
-          while maintaining a modern, digital-friendly aesthetic that bridges cultures and continents.
-        </p>
-      </div>
-    </section>
-
     <!-- CTA Section -->
     <section class="py-20 bg-gradient-to-r from-blue-600 to-purple-600 text-white">
       <div class="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-        <h2 class="text-4xl font-bold mb-6">Ready to Connect African Talent with Global Opportunities?</h2>
-        <p class="text-xl mb-8 opacity-90">Join thousands of artists, craftspeople, and skilled workers already growing their businesses through authentic connections.</p>
-        <div class="flex flex-col sm:flex-row gap-4 justify-center">
-          <button @click="goToUpload" class="bg-orange-500 hover:bg-orange-600 text-white px-8 py-4 rounded-lg font-semibold text-lg transition-all transform hover:scale-105">
-            Create Your Portfolio - Free
-          </button>
-          <button @click="goToSearch" class="bg-white text-gray-900 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-100 transition-colors">
-            Find Talent - No Fees
-          </button>
+        <h2 class="text-4xl font-bold mb-6">Ready to Connect with African Excellence?</h2>
+        <p class="text-xl mb-8 opacity-90">Join thousands already discovering authentic talent and reliable services through direct connections.</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="bg-white/10 backdrop-blur-sm rounded-lg p-6">
+            <h3 class="text-xl font-bold mb-4">Need Services?</h3>
+            <button @click="goToServices" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-3 rounded-lg font-semibold transition-all transform hover:scale-105">
+              Find Local Professionals
+            </button>
+          </div>
+          <div class="bg-white/10 backdrop-blur-sm rounded-lg p-6">
+            <h3 class="text-xl font-bold mb-4">Want Creative Work?</h3>
+            <button @click="goToTalentBrowse" class="w-full bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg font-semibold transition-all transform hover:scale-105">
+              Discover African Creatives
+            </button>
+          </div>
         </div>
-        <p class="text-sm mt-4 opacity-75">No platform fees • Direct connections • Global reach</p>
+        <p class="text-sm mt-6 opacity-75">No platform fees • Direct connections • Authentic experiences</p>
       </div>
     </section>
 
@@ -202,19 +243,20 @@
             <p class="text-gray-400">Connecting African talent to global opportunities through authentic portfolios and direct connections.</p>
           </div>
           <div>
-            <h4 class="font-semibold mb-4">For Talent</h4>
+            <h4 class="font-semibold mb-4">Services</h4>
             <ul class="space-y-2 text-gray-400">
-              <li><button @click="goToUpload" class="hover:text-white transition-colors">Create Portfolio</button></li>
-              <li><a href="#" class="hover:text-white transition-colors">Success Stories</a></li>
-              <li><a href="#" class="hover:text-white transition-colors">Getting Started</a></li>
+              <li><button @click="goToServices" class="hover:text-white transition-colors">Find Services</button></li>
+              <li><button @click="goToServiceCategory('electrician')" class="hover:text-white transition-colors">Electricians</button></li>
+              <li><button @click="goToServiceCategory('plumber')" class="hover:text-white transition-colors">Plumbers</button></li>
+              <li><button @click="goToProviderJoin" class="hover:text-white transition-colors">Join as Provider</button></li>
             </ul>
           </div>
           <div>
-            <h4 class="font-semibold mb-4">For Clients</h4>
+            <h4 class="font-semibold mb-4">Creative Talent</h4>
             <ul class="space-y-2 text-gray-400">
-              <li><button @click="goToSearch" class="hover:text-white transition-colors">Browse Talent</button></li>
-              <li><a href="#" class="hover:text-white transition-colors">How It Works</a></li>
-              <li><a href="#" class="hover:text-white transition-colors">Client Stories</a></li>
+              <li><button @click="goToTalentBrowse" class="hover:text-white transition-colors">Browse Talent</button></li>
+              <li><button @click="goToTalentUpload" class="hover:text-white transition-colors">Create Portfolio</button></li>
+              <li><a href="#" class="hover:text-white transition-colors">Success Stories</a></li>
             </ul>
           </div>
           <div>
@@ -235,32 +277,47 @@
 </template>
 
 <script setup>
-import { User, Mic, Camera, Check, Heart } from 'lucide-vue-next'
+import { ref } from 'vue'
+import { User, Mic, Camera, Check, Heart, MapPin, Phone, Globe } from 'lucide-vue-next'
 import { useRouter } from 'vue-router'
+import SharedNavigation from '@/components/common/SharedNavigation.vue'
 
 const router = useRouter()
 
-const goToApp = () => {
-  router.push('/app')
+// Popular services data
+const popularServices = ref([
+  { name: 'Electrician', icon: '⚡', slug: 'electrician', desc: 'Wiring & Repairs' },
+  { name: 'Plumber', icon: '🔧', slug: 'plumber', desc: 'Pipes & Fixtures' },
+  { name: 'Carpenter', icon: '🪚', slug: 'carpenter', desc: 'Furniture & Repair' },
+  { name: 'Cleaner', icon: '🧹', slug: 'cleaner', desc: 'Home & Office' },
+  { name: 'Painter', icon: '🎨', slug: 'painter', desc: 'Interior & Exterior' },
+  { name: 'Mechanic', icon: '🔩', slug: 'mechanic', desc: 'Auto Repair' }
+])
+
+// Navigation methods - FIXED ROUTES
+const goToServices = () => {
+  router.push('/app/services')
 }
 
-const goToUpload = () => {
-  router.push('/upload')
+const goToServiceCategory = (category) => {
+  router.push(`/app/services/${category}`)
 }
 
-const goToSearch = () => {
-  router.push('/search')
+const goToProviderJoin = () => {
+  router.push('/app/join-as-provider')
+}
+
+const goToTalentBrowse = () => {
+  router.push('/app/search')
+}
+
+const goToTalentUpload = () => {
+  router.push('/app/upload')
 }
 </script>
 
 <style scoped>
 /* Cultural Pattern Styles */
-.cultural-pattern {
-  position: relative;
-  width: 40px;
-  height: 40px;
-}
-
 .cultural-pattern-sm {
   position: relative;
   width: 32px;
@@ -273,100 +330,7 @@ const goToSearch = () => {
   height: 48px;
 }
 
-/* Standard Pattern Colors */
-.pattern-bar-1 { 
-  background: #ff6b35; 
-  height: 8px; 
-  border-radius: 4px; 
-}
-
-.pattern-bar-2 { 
-  background: #f7931e; 
-  height: 6px; 
-  border-radius: 3px; 
-  margin-top: 2px; 
-  margin-left: 4px; 
-}
-
-.pattern-bar-3 { 
-  background: #10b981; 
-  height: 6px; 
-  border-radius: 3px; 
-  margin-top: 2px; 
-  margin-left: 8px; 
-}
-
-.pattern-bar-4 { 
-  background: #2563eb; 
-  height: 4px; 
-  border-radius: 2px; 
-  margin-top: 2px; 
-  margin-left: 12px; 
-}
-
-/* Small Pattern Colors */
-.pattern-bar-sm-1 { 
-  background: #ff6b35; 
-  height: 6px; 
-  border-radius: 3px; 
-}
-
-.pattern-bar-sm-2 { 
-  background: #f7931e; 
-  height: 5px; 
-  border-radius: 2.5px; 
-  margin-top: 2px; 
-  margin-left: 3px; 
-}
-
-.pattern-bar-sm-3 { 
-  background: #10b981; 
-  height: 4px; 
-  border-radius: 2px; 
-  margin-top: 2px; 
-  margin-left: 6px; 
-}
-
-.pattern-bar-sm-4 { 
-  background: #2563eb; 
-  height: 3px; 
-  border-radius: 1.5px; 
-  margin-top: 2px; 
-  margin-left: 9px; 
-}
-
 /* Large Pattern Colors */
-.pattern-bar-lg-1 { 
-  background: #ff6b35; 
-  height: 10px; 
-  border-radius: 5px; 
-}
-
-.pattern-bar-lg-2 { 
-  background: #f7931e; 
-  height: 8px; 
-  border-radius: 4px; 
-  margin-top: 3px; 
-  margin-left: 5px; 
-}
-
-.pattern-bar-lg-3 { 
-  background: #10b981; 
-  height: 7px; 
-  border-radius: 3.5px; 
-  margin-top: 3px; 
-  margin-left: 10px; 
-}
-
-.pattern-bar-lg-4 { 
-  background: #2563eb; 
-  height: 5px; 
-  border-radius: 2.5px; 
-  margin-top: 3px; 
-  margin-left: 15px; 
-}
-
-/* White Pattern Variants for Dark Backgrounds */
 .pattern-bar-lg-white-1 { 
   background: rgba(255,255,255,0.9); 
   height: 10px; 
