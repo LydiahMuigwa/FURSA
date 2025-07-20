@@ -1,4 +1,4 @@
-<!-- ServiceProviderDashboard.vue - Updated with working language selector -->
+<!-- ServiceProviderDashboard.vue - Complete implementation with working language selector -->
 <template>
   <div class="min-h-screen bg-gray-50">
     <!-- Header -->
@@ -71,20 +71,310 @@
       </div>
     </div>
 
-    <!-- Rest of your dashboard content remains exactly the same -->
-    <!-- Stats Cards -->
+    <!-- Dashboard Content -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <!-- Stats Cards -->
       <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <!-- ... existing stats cards ... -->
+        <!-- New Requests -->
+        <div class="bg-white p-6 rounded-lg shadow">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                <Bell class="w-4 h-4 text-blue-600" />
+              </div>
+            </div>
+            <div class="ml-4">
+              <p class="text-sm font-medium text-gray-500">{{ t('dashboard.provider.stats.new_requests') }}</p>
+              <p class="text-2xl font-semibold text-gray-900">{{ stats.newRequests }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Active Quotes -->
+        <div class="bg-white p-6 rounded-lg shadow">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <div class="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center">
+                <DollarSign class="w-4 h-4 text-emerald-600" />
+              </div>
+            </div>
+            <div class="ml-4">
+              <p class="text-sm font-medium text-gray-500">{{ t('dashboard.provider.stats.active_quotes') }}</p>
+              <p class="text-2xl font-semibold text-gray-900">{{ stats.activeQuotes }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Rating -->
+        <div class="bg-white p-6 rounded-lg shadow">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <div class="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
+                <Star class="w-4 h-4 text-yellow-600" />
+              </div>
+            </div>
+            <div class="ml-4">
+              <p class="text-sm font-medium text-gray-500">{{ t('dashboard.provider.stats.rating') }}</p>
+              <p class="text-2xl font-semibold text-gray-900">{{ stats.rating }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- This Month -->
+        <div class="bg-white p-6 rounded-lg shadow">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                <Calendar class="w-4 h-4 text-purple-600" />
+              </div>
+            </div>
+            <div class="ml-4">
+              <p class="text-sm font-medium text-gray-500">{{ t('dashboard.provider.stats.this_month') }}</p>
+              <p class="text-2xl font-semibold text-gray-900">{{ stats.monthlyJobs }}</p>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <!-- Main Content -->
+      <!-- Main Content Grid -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <!-- ... all your existing dashboard content ... -->
+        <!-- Quote Requests -->
+        <div class="lg:col-span-2">
+          <div class="bg-white rounded-lg shadow">
+            <div class="px-6 py-4 border-b border-gray-200">
+              <h2 class="text-lg font-semibold text-gray-900">{{ t('dashboard.provider.quote_requests.title') }}</h2>
+              
+              <!-- Tabs -->
+              <div class="mt-4">
+                <div class="border-b border-gray-200">
+                  <nav class="-mb-px flex space-x-8">
+                    <button @click="activeTab = 'new'"
+                            :class="[
+                              'py-2 px-1 border-b-2 font-medium text-sm',
+                              activeTab === 'new' 
+                                ? 'border-blue-500 text-blue-600' 
+                                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                            ]">
+                      {{ t('dashboard.provider.quote_requests.new') }} ({{ newQuotes.length }})
+                    </button>
+                    <button @click="activeTab = 'responded'"
+                            :class="[
+                              'py-2 px-1 border-b-2 font-medium text-sm',
+                              activeTab === 'responded' 
+                                ? 'border-blue-500 text-blue-600' 
+                                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                            ]">
+                      {{ t('dashboard.provider.quote_requests.responded') }} ({{ respondedQuotes.length }})
+                    </button>
+                  </nav>
+                </div>
+              </div>
+            </div>
+
+            <!-- Quote List -->
+            <div class="divide-y divide-gray-200">
+              <!-- New Quotes Tab -->
+              <div v-if="activeTab === 'new'">
+                <div v-if="newQuotes.length === 0" class="p-8 text-center">
+                  <Bell class="mx-auto h-12 w-12 text-gray-400" />
+                  <h3 class="mt-2 text-sm font-medium text-gray-900">{{ t('dashboard.provider.quote_requests.no_new_requests') }}</h3>
+                  <p class="mt-1 text-sm text-gray-500">{{ t('dashboard.provider.quote_requests.no_new_requests_desc') }}</p>
+                </div>
+                
+                <div v-for="quote in newQuotes" :key="quote.id" class="p-6 hover:bg-gray-50">
+                  <div class="flex justify-between items-start">
+                    <div class="flex-1">
+                      <div class="flex items-center justify-between mb-2">
+                        <h3 class="text-sm font-medium text-gray-900">{{ quote.customerName }}</h3>
+                        <span class="text-xs text-gray-500">{{ formatTimeAgo(quote.submittedAt) }}</span>
+                      </div>
+                      
+                      <p class="text-sm text-blue-600 font-medium mb-1">{{ quote.serviceType }}</p>
+                      <p class="text-sm text-gray-600 mb-2 line-clamp-2">{{ quote.description }}</p>
+                      
+                      <div class="flex items-center space-x-4 text-xs text-gray-500 mb-3">
+                        <div class="flex items-center">
+                          <MapPin class="w-3 h-3 mr-1" />
+                          {{ quote.location }}
+                        </div>
+                        <div class="flex items-center">
+                          <DollarSign class="w-3 h-3 mr-1" />
+                          {{ formatBudget(quote.budget) }}
+                        </div>
+                        <div class="flex items-center">
+                          <Clock class="w-3 h-3 mr-1" />
+                          {{ formatTimeline(quote.timeline) }}
+                        </div>
+                      </div>
+                      
+                      <!-- Photos -->
+                      <div v-if="quote.photos && quote.photos.length > 0" class="flex space-x-2 mb-3">
+                        <button v-for="(photo, index) in quote.photos.slice(0, 3)" :key="index"
+                                @click="openPhotoModal(quote.photos, index)"
+                                class="w-12 h-12 rounded-lg overflow-hidden bg-gray-100 hover:opacity-75 transition-opacity">
+                          <img :src="photo" :alt="`Photo ${index + 1}`" class="w-full h-full object-cover" />
+                        </button>
+                        <button v-if="quote.photos.length > 3"
+                                @click="openPhotoModal(quote.photos, 3)"
+                                class="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center text-xs font-medium text-gray-600 hover:bg-gray-200 transition-colors">
+                          +{{ quote.photos.length - 3 }}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- Actions -->
+                  <div class="flex items-center justify-between mt-4">
+  <button @click="respondToQuote(quote)"
+          class="flex items-center justify-center px-6 py-3 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors">
+    <MessageSquare class="w-4 h-4 mr-2" />
+    {{ t('quotes.respond') }}
+  </button>
+  
+  <div class="flex items-center space-x-2">
+    <button @click="callCustomer(quote.phone)" class="p-2 text-gray-400 hover:text-emerald-600 rounded-lg hover:bg-emerald-50 transition-colors">
+      <Phone class="w-5 h-5" />
+    </button>
+    <button @click="whatsappCustomer(quote)" class="p-2 text-gray-400 hover:text-green-600 rounded-lg hover:bg-green-50 transition-colors">
+      <MessageCircle class="w-5 h-5" />
+    </button>
+  </div>
+</div>
+                </div>
+              </div>
+
+              <!-- Responded Quotes Tab -->
+              <div v-if="activeTab === 'responded'">
+                <div v-if="respondedQuotes.length === 0" class="p-8 text-center">
+                  <CheckCircle class="mx-auto h-12 w-12 text-gray-400" />
+                  <h3 class="mt-2 text-sm font-medium text-gray-900">{{ t('dashboard.provider.quote_requests.no_responses') }}</h3>
+                  <p class="mt-1 text-sm text-gray-500">{{ t('dashboard.provider.quote_requests.no_responses_desc') }}</p>
+                </div>
+                
+                <div v-for="quote in respondedQuotes" :key="quote.id" class="p-6 hover:bg-gray-50">
+                  <div class="flex justify-between items-start">
+                    <div class="flex-1">
+                      <div class="flex items-center justify-between mb-2">
+                        <h3 class="text-sm font-medium text-gray-900">{{ quote.customerName }}</h3>
+                        <span class="text-xs text-emerald-600 font-medium">{{ quote.quoteAmount }}</span>
+                      </div>
+                      
+                      <p class="text-sm text-blue-600 font-medium mb-1">{{ quote.serviceType }}</p>
+                      <p class="text-sm text-gray-600 mb-2">{{ quote.response }}</p>
+                      
+                      <div class="flex items-center space-x-4 text-xs text-gray-500">
+                        <span>Responded {{ formatTimeAgo(quote.respondedAt) }}</span>
+                        <span>•</span>
+                        <span>Ref: #{{ quote.referenceNumber }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="space-y-6">
+          <!-- Quick Actions -->
+          <div class="bg-white rounded-lg shadow p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">{{ t('dashboard.provider.quick_actions.title') }}</h3>
+            <div class="space-y-3">
+              <button @click="showScheduleModal = true"
+                      class="w-full flex items-center p-3 text-left rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">
+                <Calendar class="w-5 h-5 text-gray-400 mr-3" />
+                <div>
+                  <div class="text-sm font-medium text-gray-900">{{ t('dashboard.provider.quick_actions.schedule') }}</div>
+                  <div class="text-xs text-gray-500">{{ t('dashboard.provider.quick_actions.schedule_desc') }}</div>
+                </div>
+              </button>
+              
+              <button class="w-full flex items-center p-3 text-left rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">
+                <DollarSign class="w-5 h-5 text-gray-400 mr-3" />
+                <div>
+                  <div class="text-sm font-medium text-gray-900">{{ t('dashboard.provider.quick_actions.earnings') }}</div>
+                  <div class="text-xs text-gray-500">{{ t('dashboard.provider.quick_actions.earnings_desc') }}</div>
+                </div>
+              </button>
+              
+              <button class="w-full flex items-center p-3 text-left rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">
+                <Star class="w-5 h-5 text-gray-400 mr-3" />
+                <div>
+                  <div class="text-sm font-medium text-gray-900">{{ t('dashboard.provider.quick_actions.reviews') }}</div>
+                  <div class="text-xs text-gray-500">{{ t('dashboard.provider.quick_actions.reviews_desc') }}</div>
+                </div>
+              </button>
+              
+              <button class="w-full flex items-center p-3 text-left rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">
+                <Settings class="w-5 h-5 text-gray-400 mr-3" />
+                <div>
+                  <div class="text-sm font-medium text-gray-900">{{ t('dashboard.provider.quick_actions.settings') }}</div>
+                  <div class="text-xs text-gray-500">{{ t('dashboard.provider.quick_actions.settings_desc') }}</div>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          <!-- Performance This Month -->
+          <div class="bg-white rounded-lg shadow p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">{{ t('dashboard.provider.performance.title') }}</h3>
+            <div class="space-y-4">
+              <div>
+                <div class="flex justify-between items-center mb-1">
+                  <span class="text-sm text-gray-600">{{ t('dashboard.provider.performance.response_rate') }}</span>
+                  <span class="text-sm font-semibold text-gray-900">{{ performance.responseRate }}%</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2">
+                  <div class="bg-emerald-500 h-2 rounded-full" :style="{ width: performance.responseRate + '%' }"></div>
+                </div>
+              </div>
+              
+              <div>
+                <div class="flex justify-between items-center">
+                  <span class="text-sm text-gray-600">{{ t('dashboard.provider.performance.avg_response_time') }}</span>
+                  <span class="text-sm font-semibold text-gray-900">{{ performance.avgResponseTime }}</span>
+                </div>
+              </div>
+              
+              <div>
+                <div class="flex justify-between items-center">
+                  <span class="text-sm text-gray-600">{{ t('dashboard.provider.performance.jobs_completed') }}</span>
+                  <span class="text-sm font-semibold text-gray-900">{{ performance.jobsCompleted }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Activity -->
+          <div class="bg-white rounded-lg shadow p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">{{ t('dashboard.provider.recent_activity.title') }}</h3>
+            <div class="space-y-3">
+              <div v-for="activity in recentActivity" :key="activity.id" class="flex items-start space-x-3">
+                <div class="flex-shrink-0">
+                  <div :class="[
+                    'w-8 h-8 rounded-full flex items-center justify-center',
+                    activity.type === 'quote' ? 'bg-blue-100' :
+                    activity.type === 'review' ? 'bg-yellow-100' :
+                    activity.type === 'job' ? 'bg-emerald-100' : 'bg-gray-100'
+                  ]">
+                    <Bell v-if="activity.type === 'quote'" class="w-4 h-4 text-blue-600" />
+                    <Star v-else-if="activity.type === 'review'" class="w-4 h-4 text-yellow-600" />
+                    <CheckCircle v-else-if="activity.type === 'job'" class="w-4 h-4 text-emerald-600" />
+                  </div>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm text-gray-900">{{ activity.description }}</p>
+                  <p class="text-xs text-gray-500">{{ formatTimeAgo(activity.timestamp) }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- All your existing modals -->
+    <!-- Modals -->
     <QuoteResponseModal 
       :is-open="showResponseModal"
       :quote="selectedQuote"
@@ -172,11 +462,81 @@ const performance = ref({
 
 // Sample quote data (would come from API)
 const quotes = ref([
-  // ... your existing quote data ...
+  {
+    id: 1,
+    customerName: 'Sarah Wanjiku',
+    serviceType: 'Electrical Installation',
+    description: 'Need to install new electrical outlets in my kitchen and upgrade the main panel. The current setup is quite old.',
+    location: 'Westlands, Nairobi',
+    budget: '15k_50k',
+    timeline: 'this_week',
+    phone: '+254712345678',
+    status: 'new',
+    submittedAt: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
+    referenceNumber: 'FR2024001',
+    photos: [
+      'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=400',
+      'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400'
+    ]
+  },
+  {
+    id: 2,
+    customerName: 'David Kimani',
+    serviceType: 'Home Wiring',
+    description: 'Complete rewiring needed for a 3-bedroom house. Some circuits are not working properly.',
+    location: 'Karen, Nairobi',
+    budget: 'over_100k',
+    timeline: 'within_month',
+    phone: '+254723456789',
+    status: 'new',
+    submittedAt: new Date(Date.now() - 5 * 60 * 60 * 1000), // 5 hours ago
+    referenceNumber: 'FR2024002',
+    photos: []
+  },
+  {
+    id: 3,
+    customerName: 'Grace Muthoni',
+    serviceType: 'Electrical Repair',
+    description: 'Power outlets in the living room stopped working after a storm. Need urgent repair.',
+    location: 'Kilimani, Nairobi',
+    budget: '5k_15k',
+    timeline: 'asap',
+    phone: '+254734567890',
+    status: 'quoted',
+    submittedAt: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 day ago
+    respondedAt: new Date(Date.now() - 23 * 60 * 60 * 1000), // 23 hours ago
+    referenceNumber: 'FR2024003',
+    response: 'Thank you for reaching out. I can help with your electrical repair. Based on your description, this sounds like a circuit breaker issue. I can visit today to diagnose and fix the problem.',
+    quoteAmount: 'KES 8,500',
+    photos: []
+  }
 ])
 
 const recentActivity = ref([
-  // ... your existing activity data ...
+  {
+    id: 1,
+    type: 'quote',
+    description: 'New quote request from Sarah Wanjiku',
+    timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000)
+  },
+  {
+    id: 2,
+    type: 'review',
+    description: 'Received 5-star review from Peter Ochieng',
+    timestamp: new Date(Date.now() - 6 * 60 * 60 * 1000)
+  },
+  {
+    id: 3,
+    type: 'job',
+    description: 'Completed electrical installation for Mary Njeri',
+    timestamp: new Date(Date.now() - 12 * 60 * 60 * 1000)
+  },
+  {
+    id: 4,
+    type: 'quote',
+    description: 'Quote accepted by James Mwangi',
+    timestamp: new Date(Date.now() - 18 * 60 * 60 * 1000)
+  }
 ])
 
 // Computed properties

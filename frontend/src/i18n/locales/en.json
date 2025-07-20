@@ -9,11 +9,15 @@
     "talent": "Creative Talent",
     "join_fursa": "Join FURSA",
     "get_started": "Get Started",
-    "dashboard": "Dashboard",
-    "profile": "Profile",
-    "settings": "Settings",
-    "logout": "Logout"
+    "find_services": "Find Services Near Me",
+    "popular_services": "Popular Services",
+    "browse_talent": "Browse Creative Talent",
+    "create_portfolio": "Create Your Portfolio",
+    "join_creative": "Join as Creative Talent",
+    "join_provider": "Join as Service Provider"
   },
+
+  
   "common": {
     "welcome": "Welcome",
     "back": "Back",
@@ -46,7 +50,10 @@
     "price": "Price",
     "duration": "Duration",
     "status": "Status",
-    "notes": "Notes"
+    "notes": "Notes",
+    "language": "Choose Language",
+    "language_desc": "Select your preferred language",
+    "more_languages": "More languages coming soon"
   },
   "auth": {
     "login": "Login",
@@ -134,119 +141,7 @@
       "step1": "Customer receives your quote",
       "step2": "They'll contact you to discuss",
       "step3": "Schedule and complete the work",
-      "performance_boost": "Performance Boost!",
-      "view_responded": "View All Responded Quotes",
-      "continue_working": "Continue Working"
+      "performance_boost": "Performance Boost!"
     }
-  },
-  "schedule": {
-    "management": "Schedule Management",
-    "manage_availability": "Manage your availability and prevent double-booking",
-    "this_week": "This Week's Schedule",
-    "block_time": "Block Time Slot",
-    "block_time_desc": "Mark as unavailable",
-    "weekly_hours": "Set Weekly Hours",
-    "weekly_hours_desc": "Recurring availability",
-    "all_bookings": "All Bookings",
-    "all_bookings_desc": "Complete schedule",
-    "pending_quotes": "Pending Quote Responses",
-    "needs_scheduling": "need scheduling",
-    "schedule_now": "Schedule Now",
-    "appointment": {
-      "title": "Schedule Appointment",
-      "job_details": "Job Details",
-      "select_date": "Select Date",
-      "select_time": "Available Time Slots",
-      "customer_contact": "Customer Contact",
-      "appointment_summary": "Appointment Summary",
-      "confirm": "Confirm Appointment",
-      "scheduled": "Appointment scheduled for {customer} on {date} at {time}",
-      "end_time": "End Time"
-    },
-    "block": {
-      "title": "Block Time Slot",
-      "description": "Mark specific times as unavailable",
-      "select_date": "Select Date",
-      "start_time": "Start Time",
-      "end_time": "End Time",
-      "reason": "Reason (Optional)",
-      "reasons": {
-        "personal": "Personal Time",
-        "maintenance": "Equipment Maintenance",
-        "travel": "Travel Time",
-        "break": "Break/Lunch",
-        "meeting": "Meeting/Appointment",
-        "other": "Other"
-      },
-      "recurring": "Make this recurring",
-      "preview": "Time Block Preview",
-      "block_slot": "Block Time Slot"
-    },
-    "weekly": {
-      "title": "Set Weekly Hours",
-      "description": "Configure your regular working schedule",
-      "templates": "Quick Templates",
-      "standard": "Standard",
-      "standard_desc": "Mon-Fri 9AM-5PM", 
-      "extended": "Extended",
-      "extended_desc": "Mon-Sat 8AM-6PM",
-      "flexible": "Flexible",
-      "flexible_desc": "7 days, custom hours",
-      "include_break": "Include lunch break",
-      "break_start": "Break Start",
-      "break_end": "Break End",
-      "summary": "Weekly Summary",
-      "working_days": "Working Days",
-      "total_hours": "Total Hours",
-      "save_schedule": "Save Weekly Schedule"
-    }
-  },
-  "service": {
-    "types": {
-      "electrical": "Electrical Services",
-      "plumbing": "Plumbing",
-      "carpentry": "Carpentry",
-      "painting": "Painting",
-      "cleaning": "Cleaning",
-      "gardening": "Gardening",
-      "repairs": "General Repairs"
-    },
-    "urgency": {
-      "urgent": "Urgent",
-      "soon": "Soon", 
-      "normal": "Normal",
-      "flexible": "Flexible"
-    },
-    "timeline": {
-      "asap": "ASAP",
-      "today": "Today",
-      "this_week": "This week",
-      "next_week": "Next week", 
-      "within_month": "Within a month",
-      "flexible": "Flexible"
-    },
-    "budget_ranges": {
-      "under_5k": "Under KES 5,000",
-      "5k_15k": "KES 5,000 - 15,000",
-      "15k_50k": "KES 15,000 - 50,000", 
-      "50k_100k": "KES 50,000 - 100,000",
-      "over_100k": "Over KES 100,000"
-    }
-  },
-  "time": {
-    "hours_ago": "{count}h ago",
-    "minutes_ago": "{count}m ago",
-    "days_ago": "{count}d ago",
-    "just_now": "Just now",
-    "morning": "Morning",
-    "afternoon": "Afternoon",
-    "evening": "Evening",
-    "night": "Night"
-  },
-  "notifications": {
-    "quote_sent": "Quote response sent successfully!",
-    "appointment_scheduled": "Appointment scheduled successfully!",
-    "schedule_updated": "Weekly schedule updated!",
-    "time_blocked": "Time slot blocked successfully!"
   }
 }
