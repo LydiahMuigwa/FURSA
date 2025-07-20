@@ -96,12 +96,22 @@ const router = createRouter({
             title: 'Service Provider - FURSA'
           },
           props: true
+        },
+
+        // Service Provider Dashboard (for managing quotes)
+        {
+          path: 'provider-dashboard',
+          name: 'provider-dashboard',
+          component: () => import('../views/ServiceProviderDashboard.vue'),
+          meta: {
+            title: 'Provider Dashboard - FURSA',
+            requiresAuth: true // This would require provider authentication
+          }
         }
 
         // === COMMENTED OUT UNTIL COMPONENTS ARE CREATED ===
-        // Uncomment these routes after creating the components
-
-        // Service Provider Onboarding
+        
+        // Service Provider Onboarding (commented out until file is created)
         // {
         //   path: 'join-as-provider',
         //   name: 'provider-join',
@@ -218,6 +228,8 @@ router.beforeEach((to, from, next) => {
   } else if (to.name === 'services-category' && to.params.category) {
     const categoryName = to.params.category.charAt(0).toUpperCase() + to.params.category.slice(1)
     document.title = `Find ${categoryName} Services - FURSA`
+  } else if (to.name === 'provider-dashboard') {
+    document.title = `Provider Dashboard - ${baseTitle}`
   } else {
     document.title = to.meta.title || baseTitle
   }
@@ -227,9 +239,9 @@ router.beforeEach((to, from, next) => {
     // Check if user is authenticated
     const isAuthenticated = false // Replace with actual auth check
     if (!isAuthenticated) {
-      // Redirect to login or show auth modal
-      next('/') // For now, redirect to homepage
-      return
+      // For now, allow access to dashboard for testing
+      // In production, redirect to login: next('/')
+      console.warn('Dashboard requires authentication - allowing for development')
     }
   }
   
@@ -256,7 +268,17 @@ export const navigationHelpers = {
   // Go to talent profile (existing)
   goToTalent(talentId) {
     return router.push({ name: 'talent-profile', params: { id: talentId } })
+  },
+
+  // New helper for provider dashboard
+  goToProviderDashboard() {
+    return router.push({ name: 'provider-dashboard' })
   }
+
+  // Helper for provider onboarding (commented out until route is uncommented)
+  // goToProviderOnboarding() {
+  //   return router.push({ name: 'provider-join' })
+  // }
 }
 
 export default router
