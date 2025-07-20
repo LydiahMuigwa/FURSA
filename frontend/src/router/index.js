@@ -102,7 +102,7 @@ const router = createRouter({
         {
           path: 'provider-dashboard',
           name: 'provider-dashboard',
-          component: () => import('../views/ServiceProviderDashboard.vue'),
+          component: () => import('../components/service-provider/modals/ServiceProviderDashboard.vue'),
           meta: {
             title: 'Provider Dashboard - FURSA',
             requiresAuth: true // This would require provider authentication

@@ -264,8 +264,8 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { Search, X } from 'lucide-vue-next'
-import ServiceProviderCard from '@/components/service-provider/ServiceProviderCard.vue'
-import LocationPicker from '@/components/service-provider/LocationPicker.vue'
+import ServiceProviderCard from '@/components/service-provider/cards/ServiceProviderCard.vue'
+import LocationPicker from '@/components/service-provider/forms/LocationPicker.vue'
 
 const route = useRoute()
 const router = useRouter()

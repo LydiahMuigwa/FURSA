@@ -358,10 +358,10 @@ import {
 } from 'lucide-vue-next'
 
 // WORKING MODAL IMPORTS
-import QuoteResponseModal from '@/components/service-provider/QuoteResponseModal.vue'
-import PhotoViewerModal from '@/components/service-provider/PhotoViewerModal.vue'
-import QuoteResponseSuccessModal from '@/components/service-provider/QuoteResponseSuccessModal.vue'
-import ScheduleManagementModal from '@/components/service-provider/ScheduleManagementModal.vue'
+import QuoteResponseModal from '@/components/service-provider/modals/QuoteResponseModal.vue'
+import PhotoViewerModal from '@/components/service-provider/modals/PhotoViewerModal.vue'
+import QuoteResponseSuccessModal from '@/components/service-provider/modals/QuoteResponseSuccessModal.vue'
+import ScheduleManagementModal from '@/components/service-provider/modals/ScheduleManagementModal.vue'
 
 // Component state
 const activeTab = ref('new')

@@ -168,12 +168,46 @@
         </div>
       </div>
     </div>
+
+    <!-- Time Block Modal -->
+    <TimeBlockModal 
+      :is-open="showTimeBlockModal"
+      @close="showTimeBlockModal = false"
+      @block="handleTimeBlock"
+    />
+
+    <!-- Weekly Hours Modal -->
+    <WeeklyHoursModal 
+      :is-open="showWeeklyHoursModal"
+      @close="showWeeklyHoursModal = false"
+      @save="handleWeeklySchedule"
+    />
+
+    <!-- Schedule Appointment Modal -->
+    <ScheduleAppointmentModal 
+      :is-open="showAppointmentModal"
+      :quote="selectedQuoteForScheduling"
+      @close="showAppointmentModal = false"
+      @schedule="handleAppointmentScheduled"
+    />
+
+    <!-- All Bookings Modal -->
+    <AllBookingsModal 
+      :is-open="showAllBookingsModal"
+      @close="showAllBookingsModal = false"
+    />
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { X, ChevronLeft, ChevronRight, Clock, Calendar, FileText } from 'lucide-vue-next'
+
+// Import the new modals
+import TimeBlockModal from './TimeBlockModal.vue'
+import WeeklyHoursModal from './WeeklyHoursModal.vue'
+import ScheduleAppointmentModal from './ScheduleAppointmentModal.vue'
+import AllBookingsModal from './AllBookingsModal.vue'
 
 // Props
 const props = defineProps({
@@ -189,6 +223,13 @@ const emit = defineEmits(['close'])
 // Component state
 const currentWeekStart = ref(new Date())
 const selectedDate = ref(null)
+
+// Modal states
+const showTimeBlockModal = ref(false)
+const showWeeklyHoursModal = ref(false)
+const showAppointmentModal = ref(false)
+const showAllBookingsModal = ref(false)
+const selectedQuoteForScheduling = ref(null)
 
 // Sample data - would come from API
 const bookings = ref([
@@ -349,24 +390,55 @@ const selectDate = (date) => {
 }
 
 const scheduleQuote = (quote) => {
-  console.log('Scheduling quote for:', quote.customerName)
-  // This would open a time selection interface
-  alert(`Opening scheduler for ${quote.customerName}'s ${quote.serviceType}`)
+  selectedQuoteForScheduling.value = quote
+  showAppointmentModal.value = true
 }
 
 const blockTimeSlot = () => {
-  console.log('Block time slot')
-  alert('Time blocking feature - select dates and times to mark as unavailable')
+  showTimeBlockModal.value = true
 }
 
 const setRecurringAvailability = () => {
-  console.log('Set recurring availability')
-  alert('Recurring availability - set your regular working hours and days')
+  showWeeklyHoursModal.value = true
 }
 
 const viewAllBookings = () => {
-  console.log('View all bookings')
-  alert('All bookings view - complete calendar with past and future appointments')
+  showAllBookingsModal.value = true
+}
+
+const handleTimeBlock = (blockData) => {
+  console.log('Time blocked:', blockData)
+  // Add to blocked slots
+  alert(`Time slot blocked: ${blockData.date} from ${blockData.startTime} to ${blockData.endTime}`)
+}
+
+const handleWeeklySchedule = (scheduleData) => {
+  console.log('Weekly schedule saved:', scheduleData)
+  alert(`Weekly schedule updated: ${scheduleData.enabledDays} working days, ${scheduleData.totalHours} hours total`)
+}
+
+const handleAppointmentScheduled = (appointmentData) => {
+  console.log('Appointment scheduled:', appointmentData)
+  // Add to bookings
+  const newBooking = {
+    id: Date.now(),
+    date: appointmentData.date,
+    time: appointmentData.time,
+    service: appointmentData.quote.serviceType,
+    customer: appointmentData.quote.customerName,
+    status: 'confirmed',
+    duration: appointmentData.duration
+  }
+  
+  bookings.value.push(newBooking)
+  
+  // Remove from pending quotes
+  const quoteIndex = pendingQuotes.value.findIndex(q => q.id === appointmentData.quote.id)
+  if (quoteIndex !== -1) {
+    pendingQuotes.value.splice(quoteIndex, 1)
+  }
+  
+  alert(`Appointment scheduled for ${appointmentData.quote.customerName} on ${appointmentData.date} at ${appointmentData.time}`)
 }
 
 const closeModal = () => {

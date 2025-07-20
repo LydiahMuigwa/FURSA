@@ -318,7 +318,7 @@ import {
   User, Check, MapPin, Star, Phone, MessageCircle, FileText, Clock, 
   Shield, Image 
 } from 'lucide-vue-next'
-import QuoteRequestModal from '@/components/service-provider/QuoteRequestModal.vue'
+import QuoteRequestModal from '@/components/service-provider/forms/QuoteRequestModal.vue'
 import ContactSuccessModal from '@/components/service-provider/ContactSuccessModal.vue'
 
 const route = useRoute()
