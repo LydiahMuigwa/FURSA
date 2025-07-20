@@ -29,7 +29,7 @@
               {{ t('common.save_draft') || 'Save Draft' }}
             </button>
             <!-- Back to Dashboard -->
-            <router-link to="/app/provider/dashboard" 
+            <router-link to="/app/provider-dashboard" 
                         class="flex items-center px-4 py-2 text-gray-600 hover:text-gray-700 hover:bg-gray-50 rounded-lg transition-all">
               <ArrowLeft class="w-4 h-4 mr-2" />
               Dashboard
@@ -616,8 +616,8 @@ const publishStory = async () => {
     // Clear draft
     localStorage.removeItem('workStoryDraft')
     
-    // Redirect to success page or provider dashboard
-    router.push('/app/provider/dashboard?story=published')
+    // Redirect to correct provider dashboard route
+    router.push('/app/provider-dashboard?story=published')
     
   } catch (error) {
     console.error('Publishing failed:', error)
