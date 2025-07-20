@@ -1,0 +1,252 @@
+{
+  "app": {
+    "name": "FURSA",
+    "tagline": "Talanta ya Kiafrika duniani"
+  },
+  "navigation": {
+    "home": "Nyumbani",
+    "services": "Huduma",
+    "talent": "Talanta za Ubunifu",
+    "join_fursa": "Jiunge na FURSA",
+    "get_started": "Anza",
+    "dashboard": "Dashboard",
+    "profile": "Profile",
+    "settings": "Settings",
+    "logout": "Logout"
+  },
+  "common": {
+    "welcome": "Karibu",
+    "back": "Rudi",
+    "next": "Next",
+    "previous": "Rudi Nyuma",
+    "continue": "Endelea",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "view": "View",
+    "close": "Funga",
+    "submit": "Tuma",
+    "loading": "Inaload...",
+    "error": "Errror",
+    "success": "Success",
+    "yes": "Ndiyo",
+    "no": "Hapana",
+    "ok": "Sawa",
+    "search": "Tafuta",
+    "filter": "Filter",
+    "sort": "Sort",
+    "date": "Tarehe",
+    "time": "Muda",
+    "location": "Mahali",
+    "phone": "Simu",
+    "email": "Email",
+    "name": "Jina",
+    "description": "Maelezo",
+    "price": "Bei",
+    "duration": "Muda",
+    "status": "Hali",
+    "notes": "Maelezo"
+  },
+  "auth": {
+    "login": "Login",
+    "register": "Jisajili",
+    "welcome_back": "Karibu tena!",
+    "create_account": "Tengeneza akaunti yako",
+    "email_placeholder": "Eka email yako",
+    "password_placeholder": "Eka password yako",
+    "forgot_password": "Umesahau password?",
+    "remember_me": "Nikumbuke",
+    "already_have_account": "Uko na akaunti tayari?",
+    "dont_have_account": "Huna akaunti?",
+    "sign_up_here": "Register hapa",
+    "login_here": "Login hapa"
+  },
+  "dashboard": {
+    "provider": {
+      "title": "Dashboard ya Mtoa Huduma",
+      "welcome": "Karibu tena, {name}!",
+      "stats": {
+        "new_requests": "Maombi Mapya",
+        "active_quotes": "Bei Zinazotumika",
+        "rating": "Kiwango",
+        "this_month": "Mwezi Huu"
+      },
+      "quick_actions": {
+        "title": "Vitendo vya Haraka",
+        "schedule": "Schedule",
+        "schedule_desc": "Dhibiti upatikanaji",
+        "earnings": "Mapato",
+        "earnings_desc": "Ona malipo",
+        "reviews": "Maoni",
+        "reviews_desc": "Maoni ya wateja",
+        "settings": "settings",
+        "settings_desc": "Akaunti na wasifu"
+      },
+      "quote_requests": {
+        "title": "Maombi ya Bei",
+        "new": "Mapya",
+        "responded": "Yaliyojibiwa",
+        "no_new_requests": "Hakuna maombi mapya",
+        "no_new_requests_desc": "Maombi mapya ya bei yataonekana hapa",
+        "no_responses": "Hakuna majibu bado",
+        "no_responses_desc": "Bei ulizotuma zibaonekana hapa"
+      },
+      "recent_activity": {
+        "title": "Shughuli za Hivi Karibuni"
+      },
+      "performance": {
+        "title": "Mwezi Huu",
+        "response_rate": "Kiwango cha Majibu",
+        "avg_response_time": "Wastani wa Muda wa Majibu",
+        "jobs_completed": "Kazi Zilizokamilika"
+      }
+    }
+  },
+  "quotes": {
+    "request": "Omba Bei",
+    "respond": "Jibu",
+    "response_sent": "Jibu la Bei Limetumwa!",
+    "your_response": "Ujumbe Wako wa Majibu",
+    "quote_amount": "Kiasi cha Bei",
+    "estimated_duration": "Muda Unaokadiriwa",
+    "availability": "Upatikanaji Wako",
+    "contact_preference": "Mteja akupigie vipi?",
+    "phone_call": "Simu",
+    "whatsapp": "WhatsApp",
+    "email_contact": "Barua Pepe",
+    "send_response": "Tuma Jibu la Bei",
+    "customer_request": "Ombi la Mteja",
+    "service": "Huduma",
+    "timeline": "Muda",
+    "budget": "Bajeti",
+    "templates": {
+      "title": "Mifano ya Majibu ya Haraka",
+      "professional": "Kiwango cha Kitaaluma",
+      "detailed": "Maelezo ya Kina",
+      "emergency": "Dharura/Haraka",
+      "consultation": "Mazungumzo Kwanza"
+    },
+    "success": {
+      "title": "Jibu la Bei Limetumwa!",
+      "message": "Bei yako ya kitaalamu imetumwa kwa {customer}",
+      "what_next": "Kinachofuata ni nini?",
+      "step1": "Mteja atapokea bei yako",
+      "step2": "Atakupigia kujadili",
+      "step3": "Panga na ukamilishe kazi",
+      "performance_boost": "Ongezeko la Utendakazi!",
+      "view_responded": "Ona Bei Zote Zilizojibiwa",
+      "continue_working": "Endelea Kufanya Kazi"
+    }
+  },
+  "schedule": {
+    "management": "Usimamizi wa Ratiba",
+    "manage_availability": "Dhibiti upatikanaji wako na uzuie kufanyika kwa miadi miwili",
+    "this_week": "Ratiba ya Wiki Hii",
+    "block_time": "Zuia Wakati",
+    "block_time_desc": "Weka kuwa haupatikani",
+    "weekly_hours": "Weka Masaa ya Kila Wiki",
+    "weekly_hours_desc": "Upatikanaji wa kurudia",
+    "all_bookings": "Miadi Yote",
+    "all_bookings_desc": "Ratiba kamili",
+    "pending_quotes": "Bei Zinazongoja Majibu",
+    "needs_scheduling": "zinahitaji kupangwa",
+    "schedule_now": "Panga Sasa",
+    "appointment": {
+      "title": "Panga Miadi",
+      "job_details": "Maelezo ya Kazi",
+      "select_date": "Chagua Tarehe",
+      "select_time": "Wakati Uliopo",
+      "customer_contact": "Mawasiliano ya Mteja",
+      "appointment_summary": "Muhtasari wa Miadi",
+      "confirm": "Thibitisha Miadi",
+      "scheduled": "Miadi imepangwa kwa {customer} tarehe {date} saa {time}",
+      "end_time": "Wakati wa Mwisho"
+    },
+    "block": {
+      "title": "Zuia Wakati",
+      "description": "Weka nyakati maalum kuwa hazipo",
+      "select_date": "Chagua Tarehe",
+      "start_time": "Wakati wa Kuanza",
+      "end_time": "Wakati wa Mwisho",
+      "reason": "Sababu (Si Lazima)",
+      "reasons": {
+        "personal": "Wakati wa Kibinafsi",
+        "maintenance": "Matengenezo ya Vifaa",
+        "travel": "Wakati wa Safari",
+        "break": "Mapumziko/Chakula cha Mchana",
+        "meeting": "Mkutano/Miadi",
+        "other": "Mengineyo"
+      },
+      "recurring": "Fanya hii irudie",
+      "preview": "Muongozo wa Kuzuia Wakati",
+      "block_slot": "Zuia Wakati"
+    },
+    "weekly": {
+      "title": "Weka Masaa ya Kila Wiki",
+      "description": "Sanidi ratiba yako ya kawaida ya kufanya kazi",
+      "templates": "Mifano ya Haraka",
+      "standard": "Kawaida",
+      "standard_desc": "Jumatatu-Ijumaa 9AM-5PM",
+      "extended": "Imeongezwa",
+      "extended_desc": "Jumatatu-Jumamosi 8AM-6PM",
+      "flexible": "Kubadilika",
+      "flexible_desc": "Siku 7, masaa ya kibinafsi",
+      "include_break": "Jumuisha mapumziko ya chakula cha mchana",
+      "break_start": "Kuanza kwa Mapumziko",
+      "break_end": "Mwisho wa Mapumziko",
+      "summary": "Muhtasari wa Kila Wiki",
+      "working_days": "Siku za Kufanya Kazi",
+      "total_hours": "Jumla ya Masaa",
+      "save_schedule": "Hifadhi Ratiba ya Kila Wiki"
+    }
+  },
+  "service": {
+    "types": {
+      "electrical": "Huduma za Umeme",
+      "plumbing": "Mabomba",
+      "carpentry": "Useremala",
+      "painting": "Urangani",
+      "cleaning": "Usafi",
+      "gardening": "Bustani",
+      "repairs": "Marekebisho ya Jumla"
+    },
+    "urgency": {
+      "urgent": "Haraka",
+      "soon": "Hivi Karibuni",
+      "normal": "Kawaida",
+      "flexible": "Kubadilika"
+    },
+    "timeline": {
+      "asap": "Haraka iwezekanavyo",
+      "today": "Leo",
+      "this_week": "Wiki hii",
+      "next_week": "Wiki ijayo",
+      "within_month": "Ndani ya mwezi",
+      "flexible": "Kubadilika"
+    },
+    "budget_ranges": {
+      "under_5k": "Chini ya KES 5,000",
+      "5k_15k": "KES 5,000 - 15,000",
+      "15k_50k": "KES 15,000 - 50,000",
+      "50k_100k": "KES 50,000 - 100,000",
+      "over_100k": "Zaidi ya KES 100,000"
+    }
+  },
+  "time": {
+    "hours_ago": "masaa {count} yaliyopita",
+    "minutes_ago": "dakika {count} zilizopita", 
+    "days_ago": "siku {count} zilizopita",
+    "just_now": "Saa hii",
+    "morning": "Asubuhi",
+    "afternoon": "Mchana",
+    "evening": "Jioni",
+    "night": "Usiku"
+  },
+  "notifications": {
+    "quote_sent": "Jibu la bei limetumwa kwa mafanikio!",
+    "appointment_scheduled": "Miadi imepangwa kwa mafanikio!",
+    "schedule_updated": "Ratiba ya kila wiki imesasishwa!",
+    "time_blocked": "Wakati umezuiwa kwa mafanikio!"
+  }
+}
