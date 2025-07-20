@@ -1,4 +1,4 @@
-<!-- ServiceProviderDashboard.vue - Updated with working modals -->
+<!-- ServiceProviderDashboard.vue - Fixed template structure -->
 <template>
   <div class="min-h-screen bg-gray-50">
     <!-- Header -->
@@ -75,8 +75,43 @@
 
       <!-- Main Content -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <!-- Quote Requests -->
+        <!-- Quick Actions -->
         <div class="lg:col-span-2">
+          <div class="bg-white rounded-lg shadow mb-6">
+            <div class="p-4 border-b border-gray-200">
+              <h3 class="text-lg font-semibold text-gray-900">Quick Actions</h3>
+            </div>
+            <div class="p-4">
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <button @click="showScheduleModal = true"
+                        class="flex flex-col items-center p-4 border border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors group">
+                  <Calendar class="w-6 h-6 text-gray-500 group-hover:text-blue-600 mb-2" />
+                  <span class="text-sm font-medium text-gray-700 group-hover:text-blue-600">Schedule</span>
+                  <span class="text-xs text-gray-500">Manage availability</span>
+                </button>
+                
+                <button class="flex flex-col items-center p-4 border border-gray-200 rounded-lg hover:border-green-500 hover:bg-green-50 transition-colors group">
+                  <DollarSign class="w-6 h-6 text-gray-500 group-hover:text-green-600 mb-2" />
+                  <span class="text-sm font-medium text-gray-700 group-hover:text-green-600">Earnings</span>
+                  <span class="text-xs text-gray-500">View payments</span>
+                </button>
+                
+                <button class="flex flex-col items-center p-4 border border-gray-200 rounded-lg hover:border-purple-500 hover:bg-purple-50 transition-colors group">
+                  <Star class="w-6 h-6 text-gray-500 group-hover:text-purple-600 mb-2" />
+                  <span class="text-sm font-medium text-gray-700 group-hover:text-purple-600">Reviews</span>
+                  <span class="text-xs text-gray-500">Customer feedback</span>
+                </button>
+                
+                <button class="flex flex-col items-center p-4 border border-gray-200 rounded-lg hover:border-orange-500 hover:bg-orange-50 transition-colors group">
+                  <Settings class="w-6 h-6 text-gray-500 group-hover:text-orange-600 mb-2" />
+                  <span class="text-sm font-medium text-gray-700 group-hover:text-orange-600">Settings</span>
+                  <span class="text-xs text-gray-500">Account & profile</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quote Requests -->
           <div class="bg-white rounded-lg shadow">
             <div class="p-6 border-b border-gray-200">
               <div class="flex justify-between items-center">
@@ -293,6 +328,25 @@
       :initial-index="selectedPhotoIndex"
       @close="showPhotoModal = false"
     />
+
+    <!-- Quote Response Success Modal -->
+    <QuoteResponseSuccessModal 
+      :is-open="showSuccessModal"
+      :customer-name="lastQuoteResponse?.customerName"
+      :quote-amount="lastQuoteResponse?.quoteAmount"
+      :contact-method="lastQuoteResponse?.contactMethod"
+      :total-quotes="quotes.length"
+      :response-rate="performance.responseRate"
+      :avg-response-time="performance.avgResponseTime"
+      @close="showSuccessModal = false"
+      @view-responded="handleViewResponded"
+    />
+
+    <!-- Schedule Management Modal -->
+    <ScheduleManagementModal 
+      :is-open="showScheduleModal"
+      @close="showScheduleModal = false"
+    />
   </div>
 </template>
 
@@ -306,14 +360,19 @@ import {
 // WORKING MODAL IMPORTS
 import QuoteResponseModal from '@/components/service-provider/QuoteResponseModal.vue'
 import PhotoViewerModal from '@/components/service-provider/PhotoViewerModal.vue'
+import QuoteResponseSuccessModal from '@/components/service-provider/QuoteResponseSuccessModal.vue'
+import ScheduleManagementModal from '@/components/service-provider/ScheduleManagementModal.vue'
 
 // Component state
 const activeTab = ref('new')
 const showResponseModal = ref(false)
 const showPhotoModal = ref(false)
+const showSuccessModal = ref(false)
+const showScheduleModal = ref(false)
 const selectedQuote = ref(null)
 const selectedPhotos = ref([])
 const selectedPhotoIndex = ref(0)
+const lastQuoteResponse = ref(null)
 
 // Provider data (would come from API/auth)
 const providerName = ref('John Mwangi')
@@ -498,11 +557,16 @@ const handleQuoteResponse = (responseData) => {
     quotes.value[quoteIndex].respondedAt = new Date()
   }
   
-  // Close modal
-  showResponseModal.value = false
+  // Store response data for success modal
+  lastQuoteResponse.value = {
+    customerName: selectedQuote.value?.customerName,
+    quoteAmount: responseData.amount,
+    contactMethod: responseData.contactPreference
+  }
   
-  // Show success message
-  alert('Quote response sent successfully!')
+  // Close response modal and show success modal
+  showResponseModal.value = false
+  showSuccessModal.value = true
 }
 
 const callCustomer = (phone) => {
@@ -512,6 +576,10 @@ const callCustomer = (phone) => {
 const whatsappCustomer = (quote) => {
   const message = encodeURIComponent(`Hi ${quote.customerName}! I received your quote request through FURSA (Ref: #${quote.referenceNumber}). I'd like to discuss your ${quote.serviceType} project. When would be a good time to talk?`)
   window.open(`https://wa.me/${quote.phone.replace('+', '')}?text=${message}`, '_blank')
+}
+
+const handleViewResponded = () => {
+  activeTab.value = 'responded'
 }
 
 onMounted(() => {
