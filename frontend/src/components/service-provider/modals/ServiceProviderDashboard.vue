@@ -66,6 +66,12 @@
             <button class="p-2 text-gray-400 hover:text-gray-600 transition-colors">
               <Settings class="w-6 h-6" />
             </button>
+
+             <button @click="logout" 
+          class="flex items-center px-3 py-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-all text-sm">
+    <LogOut class="w-4 h-4 mr-2" />
+    Logout
+  </button>
           </div>
         </div>
       </div>
@@ -430,10 +436,6 @@
   </div>
 </template>
 
-<template>
-  <!-- [Previous template content remains exactly the same] -->
-</template>
-
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { 
@@ -441,6 +443,7 @@ import {
   CheckCircle, Settings, ChevronDown, Check, BookOpen
 } from 'lucide-vue-next'
 import { useI18n } from 'vue-i18n'
+import { LogOut } from 'lucide-vue-next'
 import ApiService from '@/services/api'
 import { useRouter } from 'vue-router'
 
@@ -648,6 +651,7 @@ const updateLanguagePreference = async (langCode) => {
   }
 }
 
+
 // Modal functions
 const respondToQuote = (quote) => {
   selectedQuote.value = quote
@@ -721,6 +725,12 @@ const handleViewResponded = () => {
   showSuccessModal.value = false
 }
 
+const logout = () => {
+  // Clear provider session data
+  localStorage.removeItem('fursa-provider-id')
+  router.push('/')
+}
+
 // Initialize
 onMounted(() => {
   // Initialize language from localStorage if available
@@ -745,10 +755,6 @@ onMounted(() => {
   }
 })
 </script>
-
-<style scoped>
-/* [Previous styles remain the same] */
-</style>
 
 <style scoped>
 .line-clamp-2 {

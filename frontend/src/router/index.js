@@ -107,7 +107,18 @@ const router = createRouter({
             title: 'Provider Dashboard - FURSA',
             requiresAuth: true // This would require provider authentication
           }
-        }, // ← ADDED MISSING COMMA
+        }, 
+
+        // Talent Dashboard
+        {
+          path: 'talent-dashboard',
+          name: 'talent-dashboard',
+          component: () => import('../components/talent/TalentDashboard.vue'),
+          meta: {
+            title: 'Talent Dashboard - FURSA',
+            requiresAuth: true
+          }
+        },
 
         // Service Provider Onboarding
         {
@@ -117,7 +128,17 @@ const router = createRouter({
           meta: {
             title: 'Join as Service Provider - FURSA'
           }
-        }, // ← ADDED MISSING COMMA
+        }, 
+
+        // Login Route
+{
+  path: 'login',
+  name: 'login',
+  component: () => import('../components/auth/LoginModal.vue'),
+  meta: {
+    title: 'Login - FURSA'
+  }
+},
 
         // Work Story Builder
         {

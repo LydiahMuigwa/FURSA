@@ -328,6 +328,7 @@ const submitRegistration = async () => {
   }
 }
 
+
 const goToDashboard = () => {
   showSuccessModal.value = false
   router.push('/app/provider-dashboard')

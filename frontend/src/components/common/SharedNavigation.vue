@@ -91,17 +91,26 @@
             </button>
             
             <!-- Join Dropdown -->
-            <div v-if="showJoinMenu" 
-                 @click.stop
-                 class="absolute left-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
-              <button @click="goToTalentUpload" 
-                      class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                🎨 {{ t('navigation.join_creative') || 'Join as Creative Talent' }}
-              </button>
-              <button @click="goToProviderOnboarding" 
-        class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-  🔧 {{ t('navigation.join_provider') || 'Join as Service Provider' }}</button>
-            </div>
+            <!-- Join Dropdown -->
+<div v-if="showJoinMenu" 
+     @click.stop
+     class="absolute left-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+  
+  <!-- Add Login Option -->
+  <button @click="goToLogin" 
+          class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 border-b border-gray-100">
+    🔑 Sign In to Your Account
+  </button>
+  
+  <button @click="goToTalentUpload" 
+          class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+    🎨 {{ t('navigation.join_creative') || 'Join as Creative Talent' }}
+  </button>
+  <button @click="goToProviderOnboarding" 
+          class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+    🔧 {{ t('navigation.join_provider') || 'Join as Service Provider' }}
+  </button>
+</div>
           </div>
 
           <!-- GLOBAL LANGUAGE SELECTOR - Added here -->
@@ -290,6 +299,10 @@ const goToProviderDashboard = () => {
 }
 const goToProviderOnboarding = () => {
   router.push('/app/join-as-provider')
+  closeMobileMenu()
+}
+const goToLogin = () => {
+  router.push('/app/login')
   closeMobileMenu()
 }
 const closeMobileMenu = () => {

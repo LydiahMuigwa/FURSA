@@ -641,7 +641,13 @@ const submitProfile = async () => {
 
 const goToProfile = () => {
   showSuccessModal.value = false
-  router.push('/app/talent/new') // Redirect to new profile
+  
+  // Store talent data for dashboard
+  localStorage.setItem('fursa-talent-data', JSON.stringify(formData.value))
+  localStorage.setItem('fursa-talent-id', 'temp-' + Date.now()) // Temporary ID
+  
+  // Redirect to talent dashboard instead of hardcoded profile
+  router.push('/app/talent-dashboard')
 }
 
 const goToHome = () => {

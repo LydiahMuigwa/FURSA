@@ -130,6 +130,36 @@ class ApiService {
   async getCurrentUser() {
     return this.request('/api/auth/me')
   }
+
+    // Authentication endpoints
+  async login(credentials) {
+    return this.request('/api/auth/login', {
+      method: 'POST',
+      body: JSON.stringify(credentials),
+    })
+  }
+
+  async register(userData) {
+    return this.request('/api/auth/register', {
+      method: 'POST',
+      body: JSON.stringify(userData),
+    })
+  }
+
+  async getCurrentUser() {
+    return this.request('/api/auth/me')
+  }
+
+  // Add these methods here
+  async loginServiceProvider(email, phone) {
+    const providers = await this.getServiceProviders()
+    return providers.find(p => p.email === email && p.phone === phone)
+  }
+
+  async loginTalent(email, phone) {
+    const talents = await this.getTalents()
+    return talents.find(t => t.email === email && t.phone === phone)
+  }
 }
 
 export default new ApiService()
