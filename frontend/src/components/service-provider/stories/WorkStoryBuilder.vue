@@ -608,22 +608,43 @@ const saveDraft = () => {
 const publishStory = async () => {
   isPublishing.value = true
   try {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000))
+    const providerId = localStorage.getItem('providerId') || 'demo-provider-id'
     
-    console.log('Story published!', storyData.value)
-    
-    // Clear draft
-    localStorage.removeItem('workStoryDraft')
-    
-    // Redirect to correct provider dashboard route
-    router.push('/app/provider-dashboard?story=published')
-    
+    const storyData = {
+      title: this.storyData.title,
+      description: this.storyData.introduction,
+      projectType: this.storyData.projectType,
+      beforePhotos: this.storyData.beforePhotos || [],
+      processPhotos: this.storyData.processPhotos || [],
+      afterPhotos: this.storyData.afterPhotos || [],
+      projectPhotos: this.storyData.projectPhotos || [],
+      skills: this.storyData.skills || [],
+      customerImpact: this.storyData.customerImpact,
+      voiceRecording: this.audioRecording
+    }
+
+    const response = await fetch(`/api/service-providers/${providerId}/stories`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(storyData)
+    })
+
+    if (response.ok) {
+      localStorage.removeItem('workStoryDraft')
+      
+      // SUCCESS - Show user their story is now live
+      alert('🎉 Your professional story is now live! It will appear in search results to attract customers.')
+      
+      // Redirect back to dashboard
+      this.$router.push('/app/provider-dashboard')
+    } else {
+      throw new Error('Publishing failed')
+    }
   } catch (error) {
     console.error('Publishing failed:', error)
-    // Handle error - show notification
+    alert('Unable to publish your story. Please check your connection and try again.')
   } finally {
-    isPublishing.value = false
+    this.isPublishing.value = false
   }
 }
 

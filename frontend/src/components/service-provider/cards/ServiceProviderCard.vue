@@ -69,6 +69,45 @@
           </div>
         </div>
 
+        <!-- Portfolio Preview Section - ADD AFTER response time section -->
+<div v-if="provider.stories && provider.stories.length > 0" class="mt-4 pt-4 border-t border-gray-100">
+  <div class="flex items-center justify-between mb-2">
+    <h4 class="text-sm font-medium text-gray-700 flex items-center">
+      <svg class="w-4 h-4 mr-1 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+      </svg>
+      Recent Work
+    </h4>
+    <span class="text-xs text-blue-600">{{ provider.stories.length }} projects</span>
+  </div>
+  
+  <div class="grid grid-cols-2 gap-2">
+    <div v-for="story in provider.stories.slice(0, 2)" :key="story.id" 
+         class="bg-gray-50 rounded-lg p-2 hover:bg-gray-100 transition-colors cursor-pointer">
+      
+      <div class="h-16 bg-gray-200 rounded mb-1 overflow-hidden">
+        <img v-if="story.projectPhotos?.[0] || story.afterPhotos?.[0]" 
+             :src="story.projectPhotos?.[0] || story.afterPhotos?.[0]" 
+             :alt="story.title"
+             class="w-full h-full object-cover">
+        <div v-else class="w-full h-full flex items-center justify-center">
+          <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+          </svg>
+        </div>
+      </div>
+      
+      <h5 class="text-xs font-medium text-gray-800 truncate">
+        {{ story.title || 'Professional Project' }}
+      </h5>
+      <p class="text-xs text-gray-500">Recent work</p>
+    </div>
+  </div>
+</div>
+
+
+
+
         <!-- Services Preview -->
         <div class="mb-4">
           <div class="flex flex-wrap gap-1">

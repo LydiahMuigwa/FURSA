@@ -1,4 +1,4 @@
-<!-- ServiceProviderSearch.vue - Complete version with real geolocation -->
+<!-- ServiceProviderSearch.vue - Complete version with real data loading -->
 <template>
   <div class="min-h-screen bg-gray-50">
     <!-- Search Header -->
@@ -279,6 +279,7 @@ const loading = ref(false)
 const loadingMore = ref(false)
 const hasMoreResults = ref(true)
 const showQuoteModal = ref(false)
+const allProviders = ref([])
 
 // Filters
 const filters = ref({
@@ -301,109 +302,92 @@ const quickServices = ref([
   { name: 'Mechanic', icon: '🔩' }
 ])
 
-// Sample service providers data with real coordinates (replace with API call)
-const allProviders = ref([
-  {
-    id: 1,
-    name: 'John Mwangi',
-    serviceType: 'Licensed Electrician',
-    location: 'Westlands, Nairobi',
-    latitude: -1.2634,
-    longitude: 36.8078,
-    profileImage: null,
-    verified: true,
-    backgroundCheck: true,
-    licensed: true,
-    isOnline: true,
-    rating: 4.8,
-    reviewCount: 47,
-    responseTime: '2 hours',
-    startingPrice: 'KES 2,000',
-    availability: { status: 'available', message: 'Available today' },
-    topServices: ['Home Wiring', 'Solar Installation', 'Emergency Repairs'],
-    contact: { phone: '+254712345678', whatsapp: '+254712345678' }
-  },
-  {
-    id: 2,
-    name: 'Sarah Wanjiku',
-    serviceType: 'Professional Plumber',
-    location: 'Karen, Nairobi',
-    latitude: -1.3197,
-    longitude: 36.7025,
-    profileImage: null,
-    verified: true,
-    backgroundCheck: true,
-    licensed: true,
-    isOnline: false,
-    rating: 4.6,
-    reviewCount: 32,
-    responseTime: '1 hour',
-    startingPrice: 'KES 1,500',
-    availability: { status: 'busy', message: 'Available tomorrow' },
-    topServices: ['Pipe Repairs', 'Bathroom Installation', 'Drain Cleaning'],
-    contact: { phone: '+254723456789', whatsapp: '+254723456789' }
-  },
-  {
-    id: 3,
-    name: 'David Kipchoge',
-    serviceType: 'Master Carpenter',
-    location: 'Kilimani, Nairobi',
-    latitude: -1.2921,
-    longitude: 36.7833,
-    profileImage: null,
-    verified: true,
-    backgroundCheck: false,
-    licensed: true,
-    isOnline: true,
-    rating: 4.9,
-    reviewCount: 28,
-    responseTime: '30 minutes',
-    startingPrice: 'KES 3,000',
-    availability: { status: 'available', message: 'Available now' },
-    topServices: ['Custom Furniture', 'Kitchen Cabinets', 'Door Installation'],
-    contact: { phone: '+254734567890', whatsapp: '+254734567890' }
-  },
-  {
-    id: 4,
-    name: 'Grace Muthoni',
-    serviceType: 'Professional Cleaner',
-    location: 'CBD, Nairobi',
-    latitude: -1.2864,
-    longitude: 36.8172,
-    profileImage: null,
-    verified: true,
-    backgroundCheck: true,
-    licensed: false,
-    isOnline: true,
-    rating: 4.7,
-    reviewCount: 65,
-    responseTime: '1 hour',
-    startingPrice: 'KES 1,000',
-    availability: { status: 'available', message: 'Available today' },
-    topServices: ['House Cleaning', 'Office Cleaning', 'Deep Cleaning'],
-    contact: { phone: '+254745678901', whatsapp: '+254745678901' }
-  },
-  {
-    id: 5,
-    name: 'Peter Kimani',
-    serviceType: 'House Painter',
-    location: 'Eastleigh, Nairobi',
-    latitude: -1.2921,
-    longitude: 36.8577,
-    profileImage: null,
-    verified: false,
-    backgroundCheck: true,
-    licensed: true,
-    isOnline: false,
-    rating: 4.3,
-    reviewCount: 19,
-    responseTime: '3 hours',
-    startingPrice: 'KES 2,500',
-    availability: { status: 'available', message: 'Available this week' },
-    topServices: ['Interior Painting', 'Exterior Painting', 'Wall Preparation'],
-    contact: { phone: '+254756789012', whatsapp: '+254756789012' }
+// Load real providers from API
+const loadRealProviders = async () => {
+  try {
+    loading.value = true
+    
+    // Call your API with includeStories flag
+    const response = await fetch('/api/service-providers?includeStories=true')
+    const data = await response.json()
+    
+    if (data.success) {
+      allProviders.value = data.providers.map(provider => ({
+        id: provider._id,
+        name: provider.name,
+        serviceType: provider.serviceType,
+        location: provider.location,
+        profileImage: provider.profilePhoto,
+        verified: provider.isVerified || false,
+        backgroundCheck: provider.backgroundCheck || false,
+        licensed: provider.isLicensed || false,
+        isOnline: provider.isActive || false,
+        rating: provider.rating?.average || 4.5,
+        reviewCount: provider.rating?.count || 10,
+        responseTime: provider.stats?.responseTime || '2 hours',
+        startingPrice: `KES ${provider.minPrice || 2000}`,
+        availability: {
+          status: provider.isActive ? 'available' : 'busy',
+          message: provider.availabilityMessage || 'Available for projects'
+        },
+        topServices: provider.skills || ['Professional Service'],
+        stories: provider.stories || [],
+        contact: {
+          phone: provider.phone || '+254712345678',
+          whatsapp: provider.whatsappNumber || provider.phone || '+254712345678'
+        },
+        latitude: provider.location?.coordinates?.[1] || -1.2921,
+        longitude: provider.location?.coordinates?.[0] || 36.8577
+      }))
+    } else {
+      // Fallback to hardcoded data if API fails
+      loadHardcodedData()
+    }
+  } catch (error) {
+    console.error('Failed to load real providers:', error)
+    // Fallback to hardcoded data
+    loadHardcodedData()
+  } finally {
+    loading.value = false
   }
-])
+}
+
+// Fallback hardcoded data
+const loadHardcodedData = () => {
+  allProviders.value = [
+    {
+      id: '1',
+      name: 'James Kariuki',
+      serviceType: 'Electrician',
+      location: 'Nairobi, Westlands',
+      profileImage: '/images/providers/electrician.jpg',
+      verified: true,
+      backgroundCheck: true,
+      licensed: true,
+      isOnline: true,
+      rating: 4.8,
+      reviewCount: 24,
+      responseTime: '1 hour',
+      startingPrice: 'KES 3,500',
+      availability: {
+        status: 'available',
+        message: 'Available for emergency calls'
+      },
+      topServices: ['Wiring', 'Solar Installation', 'Fault Finding'],
+      stories: [
+        { image: '/images/stories/electrician1.jpg', title: 'Office Wiring' },
+        { image: '/images/stories/electrician2.jpg', title: 'Solar Panel Installation' }
+      ],
+      contact: {
+        phone: '+254712345678',
+        whatsapp: '+254712345678'
+      },
+      latitude: -1.2657,
+      longitude: 36.8029
+    },
+    // Add more hardcoded providers as needed
+  ]
+}
 
 // Computed properties
 const pageTitle = computed(() => {
@@ -632,8 +616,12 @@ watch(() => route.params.category, (newCategory) => {
 
 // Initialize on mount
 onMounted(() => {
-  // Load initial data
-  performSearch()
+  loadRealProviders() // Instead of using hardcoded data
+  
+  // Your existing initialization code...
+  if (route.params.category) {
+    selectedCategory.value = route.params.category
+  }
 })
 </script>
 

@@ -131,7 +131,8 @@ router.get('/', async (req, res) => {
       location, 
       page = 1, 
       limit = 20,
-      search
+      search,
+      includeStories  // 🆕 ADD THIS - enables portfolio display
     } = req.query
 
     let query = { isActive: true }
@@ -157,6 +158,9 @@ router.get('/', async (req, res) => {
     }
 
     console.log('🔍 Searching providers with query:', query)
+    if (includeStories) {
+      console.log('📖 Including stories/portfolio data in results')
+    }
 
     const providers = await ServiceProvider.find(query)
       .sort({ createdAt: -1 })
@@ -165,11 +169,38 @@ router.get('/', async (req, res) => {
 
     const total = await ServiceProvider.countDocuments(query)
 
+    // 🆕 ENHANCE PROVIDERS WITH PORTFOLIO DATA
+    const enhancedProviders = providers.map(provider => {
+      const providerObj = provider.toObject()
+      
+      // Transform stories into professional portfolio items when requested
+      if (includeStories === 'true' && providerObj.stories) {
+        providerObj.stories = providerObj.stories.map(story => ({
+          ...story,
+          // Add professional display fields
+          displayTitle: professionalizeTitle(story.title),
+          projectValue: estimateProjectValue(story),
+          formattedDate: formatStoryDate(story.createdAt),
+          skillsCount: story.skills ? story.skills.length : 0
+        }))
+        
+        // Add portfolio summary
+        providerObj.portfolioSummary = {
+          totalProjects: providerObj.stories.length,
+          recentProjects: providerObj.stories.slice(-3),
+          topSkills: extractTopSkills(providerObj.stories),
+          hasVoiceIntros: providerObj.stories.some(s => s.voiceIntro)
+        }
+      }
+      
+      return providerObj
+    })
+
     console.log(`✅ Found ${providers.length} providers (${total} total)`)
 
     res.json({
       success: true,
-      providers,
+      providers: enhancedProviders,  // 🆕 RETURN ENHANCED DATA
       pagination: {
         current: parseInt(page),
         pages: Math.ceil(total / limit),
@@ -252,31 +283,60 @@ router.post('/:id/stories', async (req, res) => {
       })
     }
 
+    // 🆕 ENHANCED STORY DATA STRUCTURE
     const story = {
       id: new Date().getTime().toString(),
-      title: req.body.title,
-      description: req.body.description,
-      skills: req.body.skills || [],
+      title: req.body.title || 'Professional Project',
+      description: req.body.description || req.body.introduction,
+      projectType: req.body.projectType,
+      
+      // Photo organization for portfolio display
+      beforePhotos: req.body.beforePhotos || [],
+      processPhotos: req.body.processPhotos || [],
+      afterPhotos: req.body.afterPhotos || [],
       projectPhotos: req.body.projectPhotos || [],
-      voiceIntro: req.body.voiceIntro || null,
-      createdAt: new Date()
+      
+      // Professional details
+      skills: req.body.skills || [],
+      customerImpact: req.body.customerImpact,
+      voiceIntro: req.body.voiceRecording || req.body.voiceIntro,
+      
+      // Portfolio metadata
+      isPublic: true,
+      createdAt: new Date(),
+      updatedAt: new Date()
     }
 
+    // Initialize stories array if it doesn't exist
+    if (!provider.stories) {
+      provider.stories = []
+    }
+    
     provider.stories.push(story)
+    
+    // Update provider portfolio stats
+    provider.totalProjects = (provider.totalProjects || 0) + 1
+    provider.lastPortfolioUpdate = new Date()
+    
     await provider.save()
 
-    console.log('✅ Story added to provider:', provider._id)
+    console.log('✅ Professional story added to provider:', provider._id)
+    console.log('📊 Provider now has', provider.stories.length, 'portfolio items')
 
     res.json({ 
       success: true,
-      message: 'Story added successfully', 
-      story: provider.stories[provider.stories.length - 1] 
+      message: 'Professional story published successfully', 
+      story: story,
+      portfolioStats: {
+        totalStories: provider.stories.length,
+        hasPortfolio: true
+      }
     })
   } catch (error) {
     console.error('❌ Failed to add story:', error)
     res.status(400).json({ 
       success: false,
-      error: 'Failed to add story' 
+      error: 'Failed to publish story' 
     })
   }
 })
@@ -292,6 +352,7 @@ router.get('/:id/dashboard', async (req, res) => {
       })
     }
 
+    // 🆕 ENHANCED DASHBOARD DATA WITH PORTFOLIO STATS
     const dashboardData = {
       provider: {
         id: provider._id,
@@ -300,16 +361,28 @@ router.get('/:id/dashboard', async (req, res) => {
         email: provider.email,
         serviceType: provider.serviceType,
         location: provider.location,
-        profilePhoto: provider.profilePhoto
+        profilePhoto: provider.profilePhoto,
+        
+        // Portfolio information
+        totalStories: provider.stories ? provider.stories.length : 0,
+        hasPortfolio: provider.stories && provider.stories.length > 0,
+        lastPortfolioUpdate: provider.lastPortfolioUpdate
       },
       stats: {
         newRequests: 0,
         activeQuotes: 0,
-        rating: 0,
-        monthlyJobs: 0
+        rating: provider.rating?.average || 0,
+        monthlyJobs: 0,
+        
+        // Portfolio stats
+        portfolioViews: 0, // Could be tracked later
+        storiesPublished: provider.stories ? provider.stories.length : 0
       },
       notifications: [],
-      recentActivity: []
+      recentActivity: [],
+      
+      // Recent portfolio items
+      recentStories: provider.stories ? provider.stories.slice(-3).reverse() : []
     }
     
     res.json({
@@ -324,5 +397,75 @@ router.get('/:id/dashboard', async (req, res) => {
     })
   }
 })
+
+// 🆕 HELPER FUNCTIONS FOR PROFESSIONAL PORTFOLIO DISPLAY
+
+// Transform casual titles into professional ones
+function professionalizeTitle(title) {
+  if (!title || title.length < 10) {
+    return 'Professional Service Project'
+  }
+  
+  return title
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ')
+    .replace(/\bfix\b/gi, 'Repair')
+    .replace(/\bhelp\b/gi, 'Professional Service')
+    .replace(/\binstall\b/gi, 'Installation')
+}
+
+// Estimate project value based on type and complexity
+function estimateProjectValue(story) {
+  const baseValues = {
+    'emergency': 8000,
+    'installation': 15000,
+    'upgrade': 25000,
+    'maintenance': 5000,
+    'consultation': 3000,
+    'custom': 20000
+  }
+  
+  const baseValue = baseValues[story.projectType] || 10000
+  const skillsMultiplier = 1 + ((story.skills?.length || 0) * 0.15)
+  const photosBonus = story.projectPhotos?.length > 0 ? 1.1 : 1.0
+  
+  return Math.round(baseValue * skillsMultiplier * photosBonus)
+}
+
+// Format story date for display
+function formatStoryDate(dateString) {
+  try {
+    const date = new Date(dateString)
+    const now = new Date()
+    const diffDays = Math.floor((now - date) / (1000 * 60 * 60 * 24))
+    
+    if (diffDays < 7) return 'This week'
+    if (diffDays < 30) return 'This month'
+    if (diffDays < 90) return 'Recent project'
+    return 'Previous work'
+  } catch {
+    return 'Recent project'
+  }
+}
+
+// Extract most common skills across stories
+function extractTopSkills(stories) {
+  if (!stories || !stories.length) return []
+  
+  const skillCounts = {}
+  stories.forEach(story => {
+    if (story.skills) {
+      story.skills.forEach(skill => {
+        skillCounts[skill] = (skillCounts[skill] || 0) + 1
+      })
+    }
+  })
+  
+  return Object.entries(skillCounts)
+    .sort(([,a], [,b]) => b - a)
+    .slice(0, 5)
+    .map(([skill]) => skill)
+}
 
 module.exports = router
