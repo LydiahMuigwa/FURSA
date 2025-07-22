@@ -1,4 +1,4 @@
-// stores/auth.js - FURSA Authentication Store with Security & Validation
+// stores/auth.js - FURSA Authentication Store with Security & Validation + ROUTING FIXES
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import ApiService from '@/services/api.js'
@@ -46,8 +46,10 @@ export const useAuthStore = defineStore('auth', () => {
     return (Date.now() - lastActivity.value) < SESSION_TIMEOUT
   })
 
-  // Actions
+  // ENHANCED: Login method with proper routing return data
   const login = async (credentials, type) => {
+    console.log('🔑 Login attempt:', { type, email: credentials.email })
+    
     // Input validation
     const email = sanitizeInput(credentials.email)
     const phone = sanitizeInput(credentials.phone)
@@ -67,16 +69,29 @@ export const useAuthStore = defineStore('auth', () => {
       let userData = null
       
       if (type === 'provider') {
-        // Find provider by email and phone with security check
-        const providers = await ApiService.getServiceProviders()
-        userData = providers.find(p => 
-          p.email?.toLowerCase() === email.toLowerCase() && 
-          p.phone?.replace(/\s/g, '') === phone.replace(/\s/g, '')
-        )
+        console.log('👷 Attempting provider login...')
         
-        if (!userData) {
-          // Generic error to prevent enumeration attacks
-          throw new Error('Invalid credentials. Please check your email and phone number.')
+        // Try backend first, then fallback to searching existing providers
+        try {
+          const response = await ApiService.login({
+            email,
+            phone,
+            userType: 'provider'
+          })
+          userData = response.user
+        } catch (backendError) {
+          console.warn('Backend login failed, using fallback method')
+          
+          // Fallback to searching existing providers
+          const providers = await ApiService.getServiceProviders()
+          userData = providers.find(p => 
+            p.email?.toLowerCase() === email.toLowerCase() && 
+            p.phone?.replace(/\s/g, '') === phone.replace(/\s/g, '')
+          )
+          
+          if (!userData) {
+            throw new Error('Invalid credentials. Please check your email and phone number.')
+          }
         }
 
         // Additional security checks for providers
@@ -85,16 +100,32 @@ export const useAuthStore = defineStore('auth', () => {
         }
         
       } else if (type === 'talent') {
-        // Find talent by email and phone
-        const talents = await ApiService.getTalents()
-        userData = talents.find(t => 
-          t.email?.toLowerCase() === email.toLowerCase() && 
-          t.phone?.replace(/\s/g, '') === phone.replace(/\s/g, '')
-        )
+        console.log('🎨 Attempting talent login...')
         
-        if (!userData) {
-          throw new Error('Invalid credentials. Please check your email and phone number.')
+        // Try backend first, then fallback to searching existing talents
+        try {
+          const response = await ApiService.login({
+            email,
+            phone,
+            userType: 'talent'
+          })
+          userData = response.user
+        } catch (backendError) {
+          console.warn('Backend login failed, using fallback method')
+          
+          // Fallback to searching existing talents
+          const talents = await ApiService.getTalents()
+          userData = talents.find(t => 
+            t.email?.toLowerCase() === email.toLowerCase() && 
+            t.phone?.replace(/\s/g, '') === phone.replace(/\s/g, '')
+          )
+          
+          if (!userData) {
+            throw new Error('Invalid credentials. Please check your email and phone number.')
+          }
         }
+      } else {
+        throw new Error('Invalid user type')
       }
       
       // Set user data with security considerations
@@ -107,13 +138,13 @@ export const useAuthStore = defineStore('auth', () => {
       }
       
       user.value = secureUserData
-      userType.value = type
+      userType.value = type // CRITICAL: Set the correct user type
       lastActivity.value = Date.now()
       
       // Store in localStorage with expiration
       const authData = {
         user: secureUserData,
-        userType: type,
+        userType: type, // CRITICAL: Store the correct user type
         timestamp: Date.now(),
         expiresAt: Date.now() + SESSION_TIMEOUT
       }
@@ -127,7 +158,12 @@ export const useAuthStore = defineStore('auth', () => {
         timestamp: new Date().toISOString()
       })
       
-      return secureUserData
+      // ENHANCED: Return data for routing
+      return {
+        user: secureUserData,
+        userType: type,
+        success: true
+      }
       
     } catch (err) {
       error.value = err.message || 'Login failed. Please try again.'
@@ -146,7 +182,10 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  // ENHANCED: Register method with proper routing return data
   const register = async (userData, type) => {
+    console.log('📝 Registration attempt:', { type, email: userData.email })
+    
     // Validate and sanitize all input data
     const sanitizedData = {}
     for (const [key, value] of Object.entries(userData)) {
@@ -173,6 +212,8 @@ export const useAuthStore = defineStore('auth', () => {
       let response = null
       
       if (type === 'provider') {
+        console.log('👷 Registering as provider...')
+        
         // Additional validation for service providers
         if (!sanitizedData.serviceType) {
           throw new Error('Please select your service type')
@@ -187,9 +228,13 @@ export const useAuthStore = defineStore('auth', () => {
         userType.value = 'provider'
         
       } else if (type === 'talent') {
+        console.log('🎨 Registering as talent...')
+        
         response = await ApiService.createTalent(sanitizedData)
         user.value = response.talent || response
         userType.value = 'talent'
+      } else {
+        throw new Error('Invalid user type')
       }
       
       lastActivity.value = Date.now()
@@ -209,7 +254,12 @@ export const useAuthStore = defineStore('auth', () => {
         userType: type
       })
       
-      return user.value
+      // ENHANCED: Return data for routing
+      return {
+        user: user.value,
+        userType: type,
+        success: true
+      }
       
     } catch (err) {
       error.value = err.message || 'Registration failed. Please try again.'
@@ -239,6 +289,7 @@ export const useAuthStore = defineStore('auth', () => {
     localStorage.removeItem('fursa-provider-id') // Legacy cleanup
   }
 
+  // ENHANCED: Initialize auth with proper type restoration
   const initializeAuth = () => {
     try {
       const storedAuth = localStorage.getItem('fursa-auth')
@@ -269,9 +320,15 @@ export const useAuthStore = defineStore('auth', () => {
           localStorage.removeItem('fursa-user-type')
           localStorage.removeItem('fursa-auth-token')
           
+          console.log('✅ Legacy auth migrated:', {
+            userId: user.value._id || user.value.id,
+            userType: userType.value
+          })
+          
           return
         }
         
+        console.log('🔍 No stored auth found')
         return // No stored auth
       }
       
@@ -286,7 +343,7 @@ export const useAuthStore = defineStore('auth', () => {
       
       // Restore auth state
       user.value = authData.user
-      userType.value = authData.userType
+      userType.value = authData.userType // CRITICAL: Restore user type
       lastActivity.value = authData.timestamp
       
       console.log('✅ Auth restored:', {

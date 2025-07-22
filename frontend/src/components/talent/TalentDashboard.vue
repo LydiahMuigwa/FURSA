@@ -14,7 +14,8 @@
             </div>
             <div>
               <h1 class="text-2xl font-bold text-gray-900">Creative Talent Dashboard</h1>
-              <p class="text-gray-600">Welcome back, {{ talentName }}!</p>
+              <!-- FIXED: Use auth store for name display -->
+              <p class="text-gray-600">Welcome back, {{ authStore.userDisplayName }}!</p>
             </div>
           </div>
           <div class="flex items-center space-x-3">
@@ -210,12 +211,10 @@ import {
   Plus, LogOut
 } from 'lucide-vue-next'
 import GlobalLanguageSelector from '@/components/shared/GlobalLanguageSelector.vue'
+import { useAuthStore } from '@/stores/auth' // FIXED: Import auth store
 
 const router = useRouter()
-
-// Component state
-const talentData = ref(null)
-const talentName = ref('Creative Talent')
+const authStore = useAuthStore() // FIXED: Use auth store
 
 // Sample stats (replace with real data later)
 const stats = ref({
@@ -225,42 +224,80 @@ const stats = ref({
   completedWorks: 15
 })
 
-// Computed properties
+// FIXED: Portfolio completeness based on auth store data
 const portfolioCompleteness = computed(() => {
-  // Calculate based on talent profile completeness
-  return 65 // Sample value
+  if (!authStore.user) return 0
+  
+  let completeness = 0
+  
+  // Basic info (40%)
+  if (authStore.user.name) completeness += 10
+  if (authStore.user.email) completeness += 10
+  if (authStore.user.phone) completeness += 10
+  if (authStore.user.description) completeness += 10
+  
+  // Skills and category (30%)
+  if (authStore.user.skill) completeness += 15
+  if (authStore.user.category) completeness += 15
+  
+  // Portfolio items (30%)
+  const portfolioCount = authStore.user.portfolio?.length || 0
+  if (portfolioCount >= 1) completeness += 10
+  if (portfolioCount >= 3) completeness += 10
+  if (portfolioCount >= 5) completeness += 10
+  
+  return Math.min(completeness, 100)
 })
 
-// Methods
-const loadTalentData = async () => {
-  const talentId = localStorage.getItem('fursa-talent-id')
-  if (talentId) {
-    try {
-      // TODO: Load from API when talent endpoints are created
-      // const talent = await ApiService.getTalent(talentId)
-      // talentData.value = talent
-      // talentName.value = talent.name
-      
-      // For now, use localStorage fallback
-      const savedTalent = localStorage.getItem('fursa-talent-data')
-      if (savedTalent) {
-        const talent = JSON.parse(savedTalent)
-        talentData.value = talent
-        talentName.value = talent.name || 'Creative Talent'
-      }
-    } catch (error) {
-      console.error('Error loading talent data:', error)
+// FIXED: Load talent data from auth store
+const loadTalentData = () => {
+  console.log('🎨 Loading talent dashboard...')
+  
+  // FIXED: Check authentication using auth store
+  if (!authStore.isAuthenticated) {
+    console.log('❌ No authenticated user, redirecting to home')
+    router.push('/app')
+    return
+  }
+  
+  // FIXED: Check user type using auth store
+  if (!authStore.isTalent) {
+    console.log('❌ User is not a talent, redirecting to appropriate dashboard')
+    if (authStore.isProvider) {
+      console.log('👷 Redirecting provider to provider dashboard')
+      router.push('/app/provider-dashboard')
+    } else {
+      console.log('❓ Unknown user type, redirecting to home')
+      router.push('/app')
     }
+    return
+  }
+  
+  console.log('✅ Talent dashboard loaded for:', authStore.userDisplayName)
+  
+  // FIXED: Load additional stats from user data
+  if (authStore.user) {
+    // Update stats based on user data if available
+    if (authStore.user.stats) {
+      stats.value = {
+        views: authStore.user.stats.views || 234,
+        activeProjects: authStore.user.stats.activeProjects || 2,
+        rating: authStore.user.rating?.average || 4.8,
+        completedWorks: authStore.user.stats.completedWorks || 15
+      }
+    }
+    
+    // You could also load real data from API here using authStore.user.id
+    // const userId = authStore.user._id || authStore.user.id
+    // loadTalentStats(userId)
   }
 }
 
+// FIXED: Logout using auth store
 const logout = () => {
-  // Clear talent session data
-  localStorage.removeItem('fursa-talent-id')
-  localStorage.removeItem('fursa-talent-data')
-  
-  // Redirect to landing page
-  router.push('/')
+  console.log('🚪 Talent logging out...')
+  authStore.logout()
+  router.push('/app')
 }
 
 onMounted(() => {

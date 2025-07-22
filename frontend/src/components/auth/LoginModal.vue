@@ -195,25 +195,45 @@ const resetForm = () => {
   showDemoAccounts.value = false
 }
 
+// FIXED: Login with proper routing based on actual user type
 const submitLogin = async () => {
   try {
-    await authStore.login(formData.value, selectedUserType.value)
+    console.log('🔑 Login attempt:', { selectedType: selectedUserType.value, email: formData.value.email })
     
-    // Login successful - redirect based on user type
+    // Call the enhanced auth store login method
+    const result = await authStore.login(formData.value, selectedUserType.value)
+    
+    console.log('✅ Login successful, result:', result)
+    
+    // Close modal first
     closeModal()
     
-    const redirectPath = selectedUserType.value === 'provider' 
-      ? '/app/provider-dashboard' 
-      : '/app/talent-dashboard'
+    // CRITICAL: Use the actual user type from auth store, not the selected type
+    const actualUserType = authStore.userType
     
-    await router.push({ 
-      path: redirectPath,
-      query: { welcome: 'true' }
-    })
+    console.log('🧭 Redirecting based on actual user type:', actualUserType)
+    
+    // Redirect based on the ACTUAL user type from auth store
+    if (actualUserType === 'provider') {
+      console.log('👷 Redirecting to provider dashboard')
+      await router.push({ 
+        path: '/app/provider-dashboard',
+        query: { welcome: 'true' }
+      })
+    } else if (actualUserType === 'talent') {
+      console.log('🎨 Redirecting to talent dashboard')
+      await router.push({ 
+        path: '/app/talent-dashboard',
+        query: { welcome: 'true' }
+      })
+    } else {
+      console.log('❓ Unknown user type, redirecting to home')
+      await router.push('/app')
+    }
     
   } catch (error) {
-    // Error is already handled in the store
-    console.error('Login failed:', error)
+    console.error('❌ Login failed:', error)
+    // Error is already handled in the store and displayed in the UI
   }
 }
 

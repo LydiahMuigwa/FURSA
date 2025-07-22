@@ -528,7 +528,7 @@ const loadProviderData = async () => {
     }
   } else {
     // Redirect to login if no provider ID found
-    router.push('/login?redirect=/app/provider-dashboard')
+    router.push('/app/login?redirect=/app/provider-dashboard')
   }
 }
 

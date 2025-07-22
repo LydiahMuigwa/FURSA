@@ -22,7 +22,7 @@ const serviceProviderSchema = new mongoose.Schema({
   serviceType: {
     type: String,
     required: true,
-    enum: ['electrician', 'plumber', 'carpenter', 'cleaner', 'painter', 'mechanic', 'other']
+    enum: ['electrician', 'plumber', 'carpenter', 'cleaner', 'painter', 'mechanic','gardener', 'other']
   },
   location: {
     type: String,
