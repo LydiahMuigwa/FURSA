@@ -134,7 +134,7 @@ const router = createRouter({
         {
           path: 'login',
           name: 'login',
-          component: () => import('../components/auth/LoginModal.vue'),
+          component: () => import('../views/LoginPage.vue'),
           meta: {
             title: 'Login - FURSA',
             requiresGuest: true

@@ -1,4 +1,4 @@
-// services/api.js - Enhanced with proper authentication
+// services/api.js - Complete Fixed Version with Category Mapping
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
 
 class ApiService {
@@ -33,7 +33,7 @@ class ApiService {
       // ENHANCED: Better error handling
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({ message: 'Unknown error' }))
-        throw new Error(errorData.message || `HTTP error! status: ${response.status}`)
+        throw new Error(errorData.error || errorData.message || `HTTP error! status: ${response.status}`)
       }
       
       return await response.json()
@@ -68,20 +68,56 @@ class ApiService {
     return this.request(endpoint, { method: 'DELETE' })
   }
 
-  // === EXISTING TALENT ENDPOINTS (UNCHANGED) ===
+  // FIXED: Category mapping to match backend enum
+  mapCategory(frontendCategory) {
+    const categoryMap = {
+      'traditional-crafts': 'Artisans',
+      'modern-art': 'Creatives', 
+      'fashion-design': 'Creatives',
+      'jewelry': 'Artisans',
+      'home-decor': 'Artisans',
+      'other': 'Creatives'
+    }
+    
+    // Return mapped category or default to 'Creatives'
+    const mapped = categoryMap[frontendCategory] || 'Creatives'
+    console.log(`Mapping category: ${frontendCategory} → ${mapped}`)
+    return mapped
+  }
+
+  // === TALENT ENDPOINTS - FIXED ===
   async getTalents(filters = {}) {
-    const params = new URLSearchParams(filters)
-    return this.request(`/api/talents?${params}`)
+    const response = await this.get('/api/talents', filters)
+    return response.talents || response // Handle both response formats
   }
 
   async getTalentById(id) {
     return this.request(`/api/talents/${id}`)
   }
 
+  // FIXED: Transform data to match backend schema
   async createTalent(talentData) {
+    // Transform data to match your backend schema
+    const transformedData = {
+      name: talentData.name,
+      email: talentData.email,
+      phone: talentData.phone,
+      skill: talentData.skill,
+      category: this.mapCategory(talentData.category), // FIXED: Apply mapping
+      location: {
+        full: talentData.location,
+        city: talentData.location?.split(',')[0]?.trim(),
+        county: talentData.location?.split(',')[1]?.trim(),
+        country: talentData.location?.split(',')[2]?.trim() || 'Kenya'
+      },
+      description: talentData.description,
+      voiceLanguage: 'english'
+    }
+    
+    console.log('Sending talent data to backend:', transformedData)
     return this.request('/api/talents', {
       method: 'POST',
-      body: JSON.stringify(talentData),
+      body: JSON.stringify(transformedData)
     })
   }
 
@@ -98,7 +134,7 @@ class ApiService {
     })
   }
 
-  // === EXISTING FILE UPLOAD (UNCHANGED) ===
+  // === FILE UPLOAD ===
   async uploadFiles(files) {
     const formData = new FormData()
     files.forEach(file => formData.append('files', file))
@@ -110,13 +146,13 @@ class ApiService {
     })
   }
 
-  // === EXISTING SEARCH ENDPOINTS (UNCHANGED) ===
+  // === SEARCH ENDPOINTS ===
   async searchTalents(query, filters = {}) {
     const params = new URLSearchParams({ q: query, ...filters })
     return this.request(`/api/search?${params}`)
   }
 
-  // === EXISTING SERVICE PROVIDER ENDPOINTS (UNCHANGED) ===
+  // === SERVICE PROVIDER ENDPOINTS ===
   async createServiceProvider(providerData) {
     return this.request('/api/service-providers', {
       method: 'POST',
@@ -129,8 +165,8 @@ class ApiService {
   }
 
   async getServiceProviders(filters = {}) {
-    const params = new URLSearchParams(filters)
-    return this.request(`/api/service-providers?${params}`)
+    const response = await this.get('/api/service-providers', filters)
+    return response // Return as is
   }
 
   async updateServiceProvider(id, providerData) {
@@ -157,9 +193,9 @@ class ApiService {
     return this.request(`/api/service-providers/${providerId}/stories`)
   }
 
-  // === ENHANCED AUTHENTICATION ENDPOINTS ===
+  // === AUTHENTICATION ENDPOINTS ===
   
-  // NEW: Proper authentication with backend
+  // Proper authentication with backend
   async login(credentials) {
     return this.request('/api/auth/login', {
       method: 'POST',
@@ -178,14 +214,12 @@ class ApiService {
     return this.request('/api/auth/me')
   }
 
-  // NEW: Logout endpoint
   async logout() {
     return this.request('/api/auth/logout', {
       method: 'POST'
     })
   }
 
-  // NEW: Refresh token endpoint
   async refreshToken(token) {
     return this.request('/api/auth/refresh', {
       method: 'POST',
@@ -194,7 +228,6 @@ class ApiService {
   }
 
   // === FALLBACK METHODS (For when backend isn't ready) ===
-  // These will work with your current setup and can be removed later
   
   async loginServiceProvider(email, phone) {
     try {
@@ -256,7 +289,6 @@ class ApiService {
 
   // === USER MANAGEMENT ENDPOINTS ===
   
-  // NEW: Update user profile
   async updateUserProfile(userId, profileData) {
     return this.request(`/api/users/${userId}`, {
       method: 'PUT',
@@ -264,7 +296,6 @@ class ApiService {
     })
   }
 
-  // NEW: Delete user account
   async deleteUserAccount(userId) {
     return this.request(`/api/users/${userId}`, {
       method: 'DELETE'
@@ -273,7 +304,6 @@ class ApiService {
 
   // === QUOTE MANAGEMENT ENDPOINTS ===
   
-  // NEW: Quote-related endpoints for service providers
   async createQuoteRequest(providerId, quoteData) {
     return this.request('/api/quotes', {
       method: 'POST',
@@ -305,7 +335,6 @@ class ApiService {
 
   // === PROVIDER PREFERENCES ===
   
-  // NEW: Update provider preferences (language, notifications, etc.)
   async updateProviderPreferences(providerId, preferences) {
     return this.request(`/api/service-providers/${providerId}/preferences`, {
       method: 'PUT',
@@ -313,19 +342,71 @@ class ApiService {
     })
   }
 
+
+  // === PROVIDER DASHBOARD METHODS - Add these to your existing ApiService ===
+
+async getServiceProviderStats(providerId) {
+  try {
+    // For now, return mock data. Replace with real API call when backend is ready.
+    return {
+      pendingQuotes: 0,
+      activeQuotes: 0,
+      averageRating: 0,
+      monthlyJobs: 0
+    }
+  } catch (error) {
+    console.error('Error getting provider stats:', error)
+    return { pendingQuotes: 0, activeQuotes: 0, averageRating: 0, monthlyJobs: 0 }
+  }
+}
+
+async getProviderPerformance(providerId) {
+  try {
+    // Mock data for now - replace with real API call later
+    return {
+      responseRate: 85,
+      avgResponseTime: '2 hours',
+      completedJobs: 0
+    }
+  } catch (error) {
+    console.error('Error getting provider performance:', error)
+    return { responseRate: 0, avgResponseTime: '0 hours', completedJobs: 0 }
+  }
+}
+
+async getProviderQuotes(providerId) {
+  try {
+    // Return empty array for now - replace with real API call later
+    // When you have the backend endpoint, it would be:
+    // return this.get(`/api/service-providers/${providerId}/quotes`)
+    return []
+  } catch (error) {
+    console.error('Error getting provider quotes:', error)
+    return []
+  }
+}
+
+async getProviderActivity(providerId) {
+  try {
+    // Return empty array for now - replace with real API call later
+    // When you have the backend endpoint, it would be:
+    // return this.get(`/api/service-providers/${providerId}/activity`)
+    return []
+  } catch (error) {
+    console.error('Error getting provider activity:', error)
+    return []
+  }
+}
   // === UTILITY METHODS ===
   
-  // NEW: Check API health
   async healthCheck() {
     return this.request('/api/health')
   }
 
-  // NEW: Get supported service categories
   async getServiceCategories() {
     return this.request('/api/categories')
   }
 
-  // NEW: Get location suggestions
   async getLocationSuggestions(query) {
     return this.get('/api/locations/search', { q: query })
   }

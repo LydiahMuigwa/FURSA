@@ -1,18 +1,25 @@
 @import "tailwindcss";
 
+/* 🎨 Enhanced Design Tokens - Tailwind v4 Compatible */
 @theme {
+  /* Your existing colors - keeping them */
   --color-fursa-orange: #ff6b35;
   --color-fursa-green: #10b981;
   --color-fursa-blue: #2563eb;
+  
+  /* Adding missing yellow for complete FURSA palette */
+  --color-fursa-yellow: #f7931e;
 }
 
-/* Base styles */
+/* Base styles - Enhanced from your current */
 body {
   font-family: 'Inter', sans-serif;
   background-color: #f9fafb;
+  color: #111827;
+  line-height: 1.6;
 }
 
-/* Component classes */
+/* 🧱 Your existing component classes - Enhanced and v4 Compatible */
 .btn-primary {
   @apply bg-fursa-blue hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
 }
@@ -34,7 +41,165 @@ body {
 }
 
 .form-input {
-  @apply w-full px-3 py-3 border border-gray-300 rounded-lg 
+  @apply w-full px-4 py-3 border border-gray-300 rounded-xl 
          focus:ring-2 focus:ring-blue-500 focus:border-transparent 
-         transition-all focus:shadow-sm;
+         transition-all duration-200 bg-white;
+}
+
+/* 🆕 Additional component classes for consistency */
+
+/* Form system - building on your .form-input */
+.form-label {
+  @apply block text-sm font-semibold text-gray-700 mb-2;
+}
+
+.form-group {
+  @apply mb-6;
+}
+
+.form-error {
+  @apply text-sm text-red-600 mt-1;
+}
+
+.form-help {
+  @apply text-sm text-gray-500 mt-1;
+}
+
+/* Button variants - extending your system */
+.btn-outline {
+  @apply border-2 border-gray-300 bg-white hover:bg-gray-50 text-gray-700 font-medium py-3 px-6 rounded-lg transition-all duration-200 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2;
+}
+
+.btn-ghost {
+  @apply bg-transparent hover:bg-gray-100 text-gray-700 font-medium py-3 px-6 rounded-lg transition-all duration-200 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2;
+}
+
+/* Button sizes */
+.btn-sm {
+  @apply py-2 px-4 text-sm;
+}
+
+.btn-lg {
+  @apply py-4 px-8 text-lg;
+}
+
+/* Modal system - FIXED for Tailwind v4 */
+.modal-overlay {
+  @apply fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4;
+  backdrop-filter: blur(4px);
+}
+
+.modal-card {
+  @apply bg-white rounded-2xl max-w-md w-full p-8 shadow-2xl border border-gray-100;
+}
+
+.modal-header {
+  @apply text-center mb-6;
+}
+
+.modal-title {
+  @apply text-2xl font-bold text-gray-900 mb-2;
+}
+
+.modal-subtitle {
+  @apply text-gray-600;
+}
+
+.modal-body {
+  @apply mb-6;
+}
+
+.modal-footer {
+  @apply flex flex-col gap-3;
+}
+
+/* FURSA Cultural Pattern - Brand element */
+.cultural-pattern {
+  position: relative;
+  width: 48px;
+  height: 48px;
+}
+
+.pattern-bar-1 { 
+  background: linear-gradient(135deg, #ff6b35, #f7931e);
+  height: 8px; 
+  border-radius: 4px; 
+  box-shadow: 0 2px 8px rgba(255, 107, 53, 0.3);
+}
+
+.pattern-bar-2 { 
+  background: linear-gradient(135deg, #f7931e, #fbbf24);
+  height: 7px; 
+  border-radius: 3.5px; 
+  margin-top: 3px; 
+  margin-left: 4px; 
+  box-shadow: 0 2px 6px rgba(247, 147, 30, 0.3);
+}
+
+.pattern-bar-3 { 
+  background: linear-gradient(135deg, #10b981, #059669);
+  height: 6px; 
+  border-radius: 3px; 
+  margin-top: 3px; 
+  margin-left: 8px; 
+  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
+}
+
+.pattern-bar-4 { 
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  height: 5px; 
+  border-radius: 2.5px; 
+  margin-top: 3px; 
+  margin-left: 12px; 
+  box-shadow: 0 2px 4px rgba(37, 99, 235, 0.3);
+}
+
+/* Gradient text for FURSA branding */
+.gradient-text {
+  background: linear-gradient(135deg, #ff6b35 0%, #f7931e 25%, #10b981 50%, #2563eb 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  background-size: 200% 200%;
+  animation: gradientShift 3s ease-in-out infinite;
+}
+
+@keyframes gradientShift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* Loading states */
+.loading-spinner {
+  @apply w-5 h-5 border-2 border-transparent border-t-current rounded-full animate-spin;
+}
+
+/* Accessibility enhancements */
+.sr-only {
+  @apply absolute w-px h-px p-0 -m-px overflow-hidden whitespace-nowrap border-0;
+}
+
+/* Focus management */
+*:focus-visible {
+  outline: 2px solid #f97316;
+  outline-offset: 2px;
+}
+
+/* Responsive design helpers */
+@media (max-width: 640px) {
+  .modal-card {
+    @apply p-6 m-4;
+  }
+  
+  .card {
+    @apply p-4;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }

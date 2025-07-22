@@ -43,7 +43,7 @@ const serviceProviderRoutes = require('./routes/serviceProviders')
 app.use('/api/service-providers', serviceProviderRoutes)
 
 const talentRoutes = require('./routes/talent')
-app.use('/api/talent', talentRoutes)
+app.use('/api/talents', talentRoutes)
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI)
