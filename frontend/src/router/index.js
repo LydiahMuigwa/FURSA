@@ -85,11 +85,7 @@ const routes = [
         name: 'provider-profile-edit',
         component: () => import('@/components/service-provider/ProviderProfileEdit.vue')
       },
-      {
-        path: 'schedule',
-        name: 'provider-schedule',
-        component: () => import('@/components/service-provider/ProviderSchedule.vue')
-      },
+    
       {
         path: 'earnings',
         name: 'provider-earnings',

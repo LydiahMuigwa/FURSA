@@ -1,4 +1,4 @@
-<!-- frontend/src/layouts/ProviderDashboardLayout.vue -->
+<!-- frontend/src/layouts/ProviderDashboardLayout.vue - COMPLETE FIXED VERSION -->
 <template>
   <div class="min-h-screen bg-gray-50">
     <!-- Top Navigation Bar -->
@@ -112,13 +112,13 @@
               My Profile
             </router-link>
 
-            <!-- Schedule -->
-            <router-link to="/app/provider-dashboard/schedule" 
-                        :class="getSidebarLinkClass('schedule')"
-                        class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors">
+            <!-- Schedule - FIXED: Now opens existing modal instead of router link -->
+            <button @click="openScheduleModal" 
+                    :class="getSidebarLinkClass('schedule')"
+                    class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors w-full text-left">
               <Calendar class="w-5 h-5 mr-3" />
               Schedule
-            </router-link>
+            </button>
 
             <!-- Earnings -->
             <router-link to="/app/provider-dashboard/earnings" 
@@ -172,6 +172,12 @@
         <router-view />
       </main>
     </div>
+
+    <!-- ADDED: Schedule Management Modal -->
+    <ScheduleManagementModal 
+      :is-open="showScheduleModal"
+      @close="showScheduleModal = false"
+    />
   </div>
 </template>
 
@@ -184,12 +190,16 @@ import {
   Bell, Settings, Briefcase, ChevronDown, LogOut 
 } from 'lucide-vue-next'
 
+// ADDED: Import the existing schedule modal
+import ScheduleManagementModal from '@/components/service-provider/modals/ScheduleManagementModal.vue'
+
 const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
 
 // Reactive data
 const showProfileMenu = ref(false)
+const showScheduleModal = ref(false) // ADDED: For schedule modal
 const notificationCount = ref(3)
 const profileCompleteness = ref(75)
 const monthlyStats = ref(5)
@@ -209,6 +219,11 @@ const getSidebarLinkClass = (routeName) => {
   return isActive
     ? 'bg-blue-50 text-blue-700 border-r-2 border-blue-500'
     : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+}
+
+// ADDED: Method to open schedule modal
+const openScheduleModal = () => {
+  showScheduleModal.value = true
 }
 
 const logout = async () => {
