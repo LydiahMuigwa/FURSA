@@ -171,26 +171,28 @@
         </div>
 
         <!-- STORY BUILDER CALL-TO-ACTION CARD -->
-        <div class="bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 rounded-xl p-6 mb-8 text-white">
-          <div class="flex items-center justify-between">
-            <div class="flex-1">
-              <h3 class="text-xl font-bold mb-2">{{ t('stories.cta.title') || 'Share Your Professional Story' }}</h3>
-              <p class="text-purple-100 mb-4">{{ t('stories.cta.subtitle') || 'Show customers how you work, not just what you do. Build your visual portfolio today.' }}</p>
-              <div class="flex items-center text-sm text-purple-100">
-                <span class="mr-4">📸 Visual portfolios</span>
-                <span class="mr-4">🎥 Voice introductions</span>
-                <span>⭐ Stand out from competition</span>
-              </div>
-            </div>
-            <div class="ml-6">
-              <button @click="$router.push('/app/provider/story-builder')"
-                      class="bg-white text-purple-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-colors shadow-lg flex items-center">
-                <BookOpen class="w-5 h-5 mr-2" />
-                {{ t('stories.cta.button') || 'Tell Your Story' }}
-              </button>
-            </div>
-          </div>
+       <!-- STORY BUILDER CALL-TO-ACTION CARD - FIXED -->
+  <div class="bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 rounded-xl p-6 mb-8 text-white">
+    <div class="flex items-center justify-between">
+      <div class="flex-1">
+        <h3 class="text-xl font-bold mb-2">{{ t('stories.cta.title') || 'Share Your Professional Story' }}</h3>
+        <p class="text-purple-100 mb-4">{{ t('stories.cta.subtitle') || 'Show customers how you work, not just what you do. Build your visual portfolio today.' }}</p>
+        <div class="flex items-center text-sm text-purple-100">
+          <span class="mr-4">📸 Visual portfolios</span>
+          <span class="mr-4">🎥 Voice introductions</span>
+          <span>⭐ Stand out from competition</span>
         </div>
+      </div>
+      <div class="ml-6">
+        <!-- FIXED: Correct router path -->
+        <button @click="goToStoryBuilder"
+                class="bg-white text-purple-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-colors shadow-lg flex items-center">
+          <BookOpen class="w-5 h-5 mr-2" />
+          {{ t('stories.cta.button') || 'Tell Your Story' }}
+        </button>
+      </div>
+    </div>
+  </div>
 
         <!-- Rest of the dashboard content... -->
         <!-- Main Content Grid -->
@@ -689,6 +691,12 @@ const whatsappCustomer = (quote) => {
     })
   )
   window.open(`https://wa.me/${quote.phone.replace('+', '')}?text=${message}`, '_blank')
+}
+
+const goToStoryBuilder = () => {
+  console.log('📝 Navigating to story builder...')
+  // FIXED PATH: This was the cause of the 404 error
+  router.push('/app/provider-dashboard/story-builder')
 }
 
 const handleViewResponded = () => {
