@@ -101,6 +101,17 @@ const routes = [
       }, 
 
       {
+  path: '/app/provider-dashboard/story-builder',
+  name: 'provider-story-builder',
+  component: () => import('../components/service-provider/stories/WorkStoryBuilder.vue'),
+  meta: {
+    title: 'Tell Your Story - FURSA',
+    requiresAuth: true,
+    userType: 'provider'
+  }
+},
+
+      {
         path: 'talent-dashboard',
         name: 'talent-dashboard',
         component: () => import('../components/talent/TalentDashboard.vue'),

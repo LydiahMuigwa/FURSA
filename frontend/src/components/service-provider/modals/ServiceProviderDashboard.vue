@@ -695,7 +695,6 @@ const whatsappCustomer = (quote) => {
 
 const goToStoryBuilder = () => {
   console.log('📝 Navigating to story builder...')
-  // FIXED PATH: This was the cause of the 404 error
   router.push('/app/provider-dashboard/story-builder')
 }
 
