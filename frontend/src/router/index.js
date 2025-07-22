@@ -1,160 +1,165 @@
-// frontend/src/router/index.js - FIXED VERSION
-import { createRouter, createWebHistory } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
+// router/index.js - COMPLETE: Fixed routing with login page
 
+import { createRouter, createWebHistory } from 'vue-router'
+
+// Route definitions
 const routes = [
-  // Public routes
   {
     path: '/',
-    name: 'home',
-    component: () => import('@/views/LandingPage.vue')
+    name: 'landing',
+    component: () => import('../views/LandingPage.vue'),
+    meta: {
+      title: 'FURSA - African Talent Platform'
+    }
   },
-  {
-    path: '/login',
-    name: 'login-page',
-    component: () => import('@/components/auth/LoginPage.vue')
-  },
-  {
-    path: '/signup',
-    name: 'signup',
-    component: () => import('@/components/auth/SignupPage.vue')
-  },
-
-  // Registration flows - FIXED
-  {
-    path: '/app/join-as-provider',
-    name: 'provider-registration',
-    component: () => import('@/components/auth/ProviderRegistration.vue')
-  },
-  {
-    path: '/app/join-as-talent',
-    name: 'talent-registration', 
-    component: () => import('@/components/auth/TalentRegistration.vue')
-  },
-
-  // Main app layout
+  
+  // App routes
   {
     path: '/app',
-    component: () => import('@/layouts/AppLayout.vue'),
-    meta: { requiresAuth: false },
     children: [
       {
         path: '',
-        name: 'app-home',
-        component: () => import('@/views/AppHome.vue')
+        name: 'home',
+        component: () => import('../views/HomeView.vue'),
+        meta: {
+          title: 'Discover African Talent - FURSA'
+        }
       },
+
+      // ADDED: Login route - this was missing!
+      {
+        path: 'login',
+        name: 'login-page',
+        component: () => import('../views/LoginPage.vue'),
+        meta: {
+          title: 'Sign In - FURSA',
+          requiresGuest: true
+        }
+      },
+
+      // Search and Browse
+      {
+        path: 'search',
+        name: 'search',
+        component: () => import('../views/SearchView.vue'),
+        meta: {
+          title: 'Search Talent - FURSA'
+        }
+      },
+
+      {
+        path: 'talent/:id',
+        name: 'talent-profile',
+        component: () => import('../views/TalentProfile.vue'),
+        meta: {
+          title: 'Talent Profile - FURSA'
+        },
+        props: true
+      },
+
+      // Service Provider Routes
+      {
+        path: 'services',
+        name: 'services',
+        component: () => import('../views/ServiceProviderSearch.vue'),
+        meta: {
+          title: 'Find Services Near You - FURSA'
+        }
+      },
+
       {
         path: 'services/:category',
         name: 'services-category',
-        component: () => import('@/components/services/ServiceCategory.vue'),
+        component: () => import('../views/ServiceProviderSearch.vue'),
+        meta: {
+          title: 'Find Services - FURSA'
+        },
         props: true
       },
-      {
-        path: 'services/:category/:service',
-        name: 'service-details',
-        component: () => import('@/components/services/ServiceDetails.vue'),
-        props: true
-      },
-      {
-        path: 'provider/:id',
-        name: 'provider-profile-public',
-        component: () => import('@/components/service-provider/PublicProviderProfile.vue'),
-        props: true
-      }
-    ]
-  },
 
-  // SERVICE PROVIDER DASHBOARD - COMPLETELY FIXED
-  {
-    path: '/app/provider-dashboard',
-    component: () => import('@/layouts/ProviderDashboardLayout.vue'),
-    meta: { requiresAuth: true, userType: 'provider' },
-    children: [
       {
-        path: '',
+        path: 'service-provider/:id',
+        name: 'service-provider-profile',
+        component: () => import('../views/ServiceProviderProfile.vue'),
+        meta: {
+          title: 'Service Provider - FURSA'
+        },
+        props: true
+      },
+
+      // === PROTECTED DASHBOARD ROUTES ===
+      {
+        path: 'provider-dashboard',
         name: 'provider-dashboard',
-        component: () => import('@/components/service-provider/modals/ServiceProviderDashboard.vue')
-      },
+        // FIXED: Correct path to ServiceProviderDashboard component (it's in modals folder)
+        component: () => import('../components/service-provider/modals/ServiceProviderDashboard.vue'),
+        meta: {
+          title: 'Provider Dashboard - FURSA',
+          requiresAuth: true,
+          userType: 'provider' // CRITICAL: Only providers can access
+        }
+      }, 
+
       {
-        path: 'story-builder', // FIXED: This was the 404 issue
-        name: 'provider-story-builder',
-        component: () => import('@/components/service-provider/stories/WorkStoryBuilder.vue')
+        path: 'talent-dashboard',
+        name: 'talent-dashboard',
+        component: () => import('../components/talent/TalentDashboard.vue'),
+        meta: {
+          title: 'Talent Dashboard - FURSA',
+          requiresAuth: true,
+          userType: 'talent' // CRITICAL: Only talents can access
+        }
       },
+
+      // Registration Routes
+      {
+        path: 'join-as-provider',
+        name: 'provider-registration',
+        component: () => import('../views/UnifiedRegistration.vue'),
+        meta: {
+          title: 'Join as Service Provider - FURSA',
+          userType: 'provider',
+          requiresGuest: true
+        }
+      },
+
+      {
+        path: 'upload',
+        name: 'talent-registration',
+        component: () => import('../views/UnifiedRegistration.vue'),
+        meta: {
+          title: 'Join as Creative Talent - FURSA',
+          userType: 'talent',
+          requiresGuest: true
+        }
+      },
+
+      // Profile Routes
       {
         path: 'profile',
-        name: 'provider-profile-edit',
-        component: () => import('@/components/service-provider/ProviderProfileEdit.vue')
-      },
-    
-      {
-        path: 'earnings',
-        name: 'provider-earnings',
-        component: () => import('@/components/service-provider/ProviderEarnings.vue')
-      },
-      {
-        path: 'reviews',
-        name: 'provider-reviews',
-        component: () => import('@/components/service-provider/ProviderReviews.vue')
-      },
-      {
-        path: 'settings',
-        name: 'provider-settings',
-        component: () => import('@/components/service-provider/ProviderSettings.vue')
+        name: 'user-profile',
+        component: () => import('../views/UserProfile.vue'),
+        meta: {
+          title: 'My Profile - FURSA',
+          requiresAuth: true
+        }
       }
     ]
   },
 
-  // TALENT DASHBOARD
-  {
-    path: '/app/talent-dashboard',
-    component: () => import('@/layouts/TalentDashboardLayout.vue'),
-    meta: { requiresAuth: true, userType: 'talent' },
-    children: [
-      {
-        path: '',
-        name: 'talent-dashboard',
-        component: () => import('@/components/creative-talent/TalentDashboard.vue')
-      },
-      {
-        path: 'portfolio',
-        name: 'talent-portfolio',
-        component: () => import('@/components/creative-talent/PortfolioBuilder.vue')
-      },
-      {
-        path: 'orders',
-        name: 'talent-orders',
-        component: () => import('@/components/creative-talent/TalentOrders.vue')
-      }
-    ]
-  },
-
-  // Service search routes
-  {
-    path: '/app/services/painter',
-    name: 'painter-services',
-    component: () => import('@/components/services/PainterServices.vue')
-  },
-  {
-    path: '/app/services/electrician',
-    name: 'electrician-services',
-    component: () => import('@/components/services/ElectricianServices.vue')
-  },
-  {
-    path: '/app/services/plumber',
-    name: 'plumber-services',
-    component: () => import('@/components/services/PlumberServices.vue')
-  },
-
-  // Catch-all 404
+  // 404 Route
   {
     path: '/:pathMatch(.*)*',
     name: 'not-found',
-    component: () => import('@/views/NotFound.vue')
+    component: () => import('../views/NotFound.vue'),
+    meta: {
+      title: 'Page Not Found - FURSA'
+    }
   }
 ]
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHistory(import.meta.env.BASE_URL),
   routes,
   scrollBehavior(to, from, savedPosition) {
     if (savedPosition) {
@@ -165,55 +170,119 @@ const router = createRouter({
   }
 })
 
-// Enhanced navigation guard with proper auth checking
+// ENHANCED: Authentication guards with login route handling
 router.beforeEach(async (to, from, next) => {
+  // Import auth store dynamically to avoid circular imports
+  const { useAuthStore } = await import('@/stores/auth')
   const authStore = useAuthStore()
-  
-  console.log('🔄 Navigation Guard:', {
-    to: to.path,
-    from: from.path,
-    requiresAuth: to.meta.requiresAuth,
-    userType: to.meta.userType,
-    isAuthenticated: authStore.isAuthenticated,
-    currentUserType: authStore.user?.userType
-  })
 
-  // Check if route requires authentication
+  // Initialize auth if not already done
+  if (!authStore.user && !authStore.isLoading) {
+    await authStore.initializeAuth()
+  }
+
+  // Update page title
+  const baseTitle = 'FURSA - African Talent Platform'
+  document.title = to.meta.title || baseTitle
+
+  console.log('🧭 Navigating to:', to.path, 'User type:', authStore.userType, 'Authenticated:', authStore.isAuthenticated)
+
+  // FIXED: Authentication guards with proper user type checking
   if (to.meta.requiresAuth) {
     if (!authStore.isAuthenticated) {
-      console.log('❌ Not authenticated, redirecting to login')
-      return next({ name: 'login-page', query: { redirect: to.fullPath } })
+      console.log('🔒 Authentication required, redirecting to login page')
+      next({ 
+        name: 'login-page', 
+        query: { 
+          redirectTo: to.fullPath
+        } 
+      })
+      return
     }
-
-    // Check user type if specified
-    if (to.meta.userType && authStore.user?.userType !== to.meta.userType) {
-      console.log('❌ Wrong user type, redirecting')
+    
+    // CRITICAL: Check if user type matches required route type
+    if (to.meta.userType && authStore.userType !== to.meta.userType) {
+      console.log(`🚫 User type mismatch. Route requires: ${to.meta.userType}, User is: ${authStore.userType}`)
       
-      // Redirect to correct dashboard based on actual user type
-      if (authStore.user?.userType === 'provider') {
-        return next('/app/provider-dashboard')
-      } else if (authStore.user?.userType === 'talent') {
-        return next('/app/talent-dashboard')
+      // Redirect to appropriate dashboard based on actual user type
+      if (authStore.userType === 'provider') {
+        console.log('👷 Redirecting provider to provider dashboard')
+        next('/app/provider-dashboard')
+      } else if (authStore.userType === 'talent') {
+        console.log('🎨 Redirecting talent to talent dashboard')
+        next('/app/talent-dashboard')
       } else {
-        return next('/app')
+        console.log('❓ Unknown user type, redirecting to home')
+        next('/app')
       }
+      return
     }
+  }
+
+  // ENHANCED: Guest-only routes (registration/login)
+  if (to.meta.requiresGuest && authStore.isAuthenticated) {
+    console.log('👤 Already authenticated user trying to access guest route')
+    
+    // Redirect authenticated users to their appropriate dashboard
+    if (authStore.userType === 'provider') {
+      console.log('👷 Authenticated provider redirected to provider dashboard')
+      next('/app/provider-dashboard')
+    } else if (authStore.userType === 'talent') {
+      console.log('🎨 Authenticated talent redirected to talent dashboard')
+      next('/app/talent-dashboard')
+    } else {
+      next('/app')
+    }
+    return
   }
 
   next()
 })
 
-// Enhanced navigation helper with FIXED paths
+// ENHANCED: Navigation helper functions
 export const navigationHelpers = {
-  // Service navigation
-  goToService(category, service = null) {
-    if (service) {
-      return router.push({ name: 'service-details', params: { category, service } })
-    }
-    return router.push({ name: 'services-category', params: { category } })
+  // Dashboard navigation - FIXED to check user type
+  goToDashboard() {
+    return new Promise((resolve) => {
+      import('@/stores/auth').then(({ useAuthStore }) => {
+        const authStore = useAuthStore()
+        
+        console.log('🧭 goToDashboard called. User type:', authStore.userType)
+        
+        if (!authStore.isAuthenticated) {
+          console.log('❌ User not authenticated, redirecting to login')
+          router.push('/app/login')
+          resolve()
+          return
+        }
+        
+        if (authStore.userType === 'provider') {
+          console.log('👷 Navigating to provider dashboard')
+          router.push('/app/provider-dashboard')
+        } else if (authStore.userType === 'talent') {
+          console.log('🎨 Navigating to talent dashboard')
+          router.push('/app/talent-dashboard')
+        } else {
+          console.log('❓ Unknown user type, redirecting to home')
+          router.push('/app')
+        }
+        resolve()
+      })
+    })
   },
 
-  goToServiceSearch(category, query = {}, location = {}) {
+  // Profile navigation
+  goToProvider(providerId) {
+    return router.push({ name: 'service-provider-profile', params: { id: providerId } })
+  },
+  
+  goToTalent(talentId) {
+    return router.push({ name: 'talent-profile', params: { id: talentId } })
+  },
+
+  // Service search
+  searchService(category, location = null) {
+    const query = location ? { location } : {}
     return router.push({ 
       name: 'services-category', 
       params: { category },
@@ -230,7 +299,7 @@ export const navigationHelpers = {
     return router.push({ name: 'talent-registration' })
   },
 
-  // Authentication
+  // Authentication - ENHANCED with login page
   requireLogin() {
     return router.push({ name: 'login-page' })
   },
@@ -263,37 +332,12 @@ export const navigationHelpers = {
       console.log('👷 Provider registered, going to provider dashboard')
       return router.push('/app/provider-dashboard')
     } else if (userType === 'talent') {
-      console.log('🎨 Talent registered, going to talent dashboard') 
+      console.log('🎨 Talent registered, going to talent dashboard')
       return router.push('/app/talent-dashboard')
     } else {
       console.log('❓ Unknown user type after registration')
       return router.push('/app')
     }
-  },
-
-  // FIXED: Provider dashboard navigation
-  goToStoryBuilder() {
-    return router.push('/app/provider-dashboard/story-builder')
-  },
-
-  goToProviderProfile() {
-    return router.push('/app/provider-dashboard/profile')
-  },
-
-  goToProviderSchedule() {
-    return router.push('/app/provider-dashboard/schedule')
-  },
-
-  goToProviderEarnings() {
-    return router.push('/app/provider-dashboard/earnings')
-  },
-
-  goToProviderReviews() {
-    return router.push('/app/provider-dashboard/reviews')
-  },
-
-  goToProviderSettings() {
-    return router.push('/app/provider-dashboard/settings')
   }
 }
 
