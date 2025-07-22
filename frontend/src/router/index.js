@@ -1,4 +1,4 @@
-// router/index.js - FIXED: Proper routing for talent vs provider dashboards
+// router/index.js - COMPLETE: Fixed routing with login page
 
 import { createRouter, createWebHistory } from 'vue-router'
 
@@ -23,6 +23,17 @@ const routes = [
         component: () => import('../views/HomeView.vue'),
         meta: {
           title: 'Discover African Talent - FURSA'
+        }
+      },
+
+      // ADDED: Login route - this was missing!
+      {
+        path: 'login',
+        name: 'login-page',
+        component: () => import('../views/LoginPage.vue'),
+        meta: {
+          title: 'Sign In - FURSA',
+          requiresGuest: true
         }
       },
 
@@ -76,10 +87,11 @@ const routes = [
         props: true
       },
 
-      // === PROTECTED DASHBOARD ROUTES - FIXED ===
+      // === PROTECTED DASHBOARD ROUTES ===
       {
         path: 'provider-dashboard',
         name: 'provider-dashboard',
+        // FIXED: Correct path to ServiceProviderDashboard component (it's in modals folder)
         component: () => import('../components/service-provider/modals/ServiceProviderDashboard.vue'),
         meta: {
           title: 'Provider Dashboard - FURSA',
@@ -158,7 +170,7 @@ const router = createRouter({
   }
 })
 
-// FIXED: Enhanced authentication guards
+// ENHANCED: Authentication guards with login route handling
 router.beforeEach(async (to, from, next) => {
   // Import auth store dynamically to avoid circular imports
   const { useAuthStore } = await import('@/stores/auth')
@@ -178,12 +190,11 @@ router.beforeEach(async (to, from, next) => {
   // FIXED: Authentication guards with proper user type checking
   if (to.meta.requiresAuth) {
     if (!authStore.isAuthenticated) {
-      console.log('🔒 Authentication required, redirecting to home with login prompt')
+      console.log('🔒 Authentication required, redirecting to login page')
       next({ 
-        name: 'home', 
+        name: 'login-page', 
         query: { 
-          redirectTo: to.fullPath,
-          showLogin: 'true' 
+          redirectTo: to.fullPath
         } 
       })
       return
@@ -208,7 +219,7 @@ router.beforeEach(async (to, from, next) => {
     }
   }
 
-  // FIXED: Guest-only routes (registration/login)
+  // ENHANCED: Guest-only routes (registration/login)
   if (to.meta.requiresGuest && authStore.isAuthenticated) {
     console.log('👤 Already authenticated user trying to access guest route')
     
@@ -228,7 +239,7 @@ router.beforeEach(async (to, from, next) => {
   next()
 })
 
-// FIXED: Navigation helper functions with proper type checking
+// ENHANCED: Navigation helper functions
 export const navigationHelpers = {
   // Dashboard navigation - FIXED to check user type
   goToDashboard() {
@@ -239,8 +250,8 @@ export const navigationHelpers = {
         console.log('🧭 goToDashboard called. User type:', authStore.userType)
         
         if (!authStore.isAuthenticated) {
-          console.log('❌ User not authenticated, redirecting to home')
-          router.push('/app')
+          console.log('❌ User not authenticated, redirecting to login')
+          router.push('/app/login')
           resolve()
           return
         }
@@ -288,9 +299,13 @@ export const navigationHelpers = {
     return router.push({ name: 'talent-registration' })
   },
 
-  // Authentication
+  // Authentication - ENHANCED with login page
   requireLogin() {
-    return router.push({ name: 'home', query: { showLogin: 'true' } })
+    return router.push({ name: 'login-page' })
+  },
+
+  goToLogin() {
+    return router.push({ name: 'login-page' })
   },
 
   // FIXED: After login redirection
