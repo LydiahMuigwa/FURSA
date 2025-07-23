@@ -1,481 +1,388 @@
+<!-- ServiceProviderDashboard.vue - INTEGRATED VERSION (works inside ProviderDashboardLayout) -->
 <template>
-  <div class="min-h-screen bg-gray-50">
-    <!-- Header -->
-    <header class="bg-white shadow">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between items-center py-4">
-          <div>
-            <h1 class="text-2xl font-bold text-gray-900">Provider Dashboard</h1>
-            <p class="text-gray-600">Welcome back, {{ authStore.userDisplayName }}!</p>
-          </div>
-          <div class="flex items-center space-x-4">
-            <!-- Language Dropdown -->
-            <div class="relative">
+  <div class="space-y-6">
+    <!-- Welcome Header (replaces the standalone header) -->
+    <div class="bg-white rounded-lg shadow-sm p-6">
+      <div class="flex justify-between items-center">
+        <div>
+          <h1 class="text-2xl font-bold text-gray-900">Welcome back, {{ authStore.userDisplayName }}!</h1>
+          <p class="text-gray-600 mt-1">Here's what's happening with your business today.</p>
+        </div>
+        <div class="flex items-center space-x-3">
+          <!-- Language Dropdown (moved from header to dashboard content) -->
+          <div class="relative">
+            <button 
+              @click="showLanguageDropdown = !showLanguageDropdown"
+              class="flex items-center space-x-2 px-3 py-2 rounded-lg border border-gray-200 hover:border-gray-300 transition-colors bg-white"
+              aria-label="Select Language"
+            >
+              <span class="text-lg">{{ currentLanguageFlag }}</span>
+              <span class="text-sm font-medium text-gray-700">{{ currentLanguageName }}</span>
+              <ChevronDown :class="[
+                'w-4 h-4 text-gray-500 transition-transform',
+                showLanguageDropdown ? 'rotate-180' : ''
+              ]" />
+            </button>
+
+            <div 
+              v-if="showLanguageDropdown" 
+              class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50"
+            >
               <button 
-                @click="showLanguageDropdown = !showLanguageDropdown"
-                class="flex items-center space-x-2 px-3 py-2 rounded-lg border border-gray-200 hover:border-gray-300 transition-colors bg-white"
-                aria-label="Select Language"
+                @click="switchToLanguage('en')"
+                :class="[
+                  'w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors flex items-center justify-between',
+                  currentLanguage === 'en' ? 'bg-blue-50 border-r-2 border-blue-500' : ''
+                ]"
               >
-                <span class="text-lg">{{ currentLanguageFlag }}</span>
-                <span class="text-sm font-medium text-gray-700">{{ currentLanguageName }}</span>
-                <ChevronDown :class="[
-                  'w-4 h-4 text-gray-500 transition-transform',
-                  showLanguageDropdown ? 'rotate-180' : ''
-                ]" />
+                <div class="flex items-center space-x-3">
+                  <span class="text-lg">🇬🇧</span>
+                  <div>
+                    <div class="text-sm font-medium text-gray-900">English</div>
+                    <div class="text-xs text-gray-500">English</div>
+                  </div>
+                </div>
+                <Check v-if="currentLanguage === 'en'" class="w-4 h-4 text-blue-600" />
               </button>
-
-              <div 
-                v-if="showLanguageDropdown" 
-                class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50"
-              >
-                <button 
-                  @click="switchToLanguage('en')"
-                  :class="[
-                    'w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors flex items-center justify-between',
-                    currentLanguage === 'en' ? 'bg-blue-50 border-r-2 border-blue-500' : ''
-                  ]"
-                >
-                  <div class="flex items-center space-x-3">
-                    <span class="text-lg">🇬🇧</span>
-                    <div>
-                      <div class="text-sm font-medium text-gray-900">English</div>
-                      <div class="text-xs text-gray-500">English</div>
-                    </div>
-                  </div>
-                  <Check v-if="currentLanguage === 'en'" class="w-4 h-4 text-blue-600" />
-                </button>
-                
-                <button 
-                  @click="switchToLanguage('sw')"
-                  :class="[
-                    'w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors flex items-center justify-between',
-                    currentLanguage === 'sw' ? 'bg-blue-50 border-r-2 border-blue-500' : ''
-                  ]"
-                >
-                  <div class="flex items-center space-x-3">
-                    <span class="text-lg">🇰🇪</span>
-                    <div>
-                      <div class="text-sm font-medium text-gray-900">Kiswahili</div>
-                      <div class="text-xs text-gray-500">Swahili</div>
-                    </div>
-                  </div>
-                  <Check v-if="currentLanguage === 'sw'" class="w-4 h-4 text-blue-600" />
-                </button>
-              </div>
-            </div>
-            
-            <button 
-              class="p-2 text-gray-400 hover:text-gray-600 transition-colors rounded-lg hover:bg-gray-100"
-              aria-label="Notifications"
-            >
-              <Bell class="w-6 h-6" />
-            </button>
-            
-            <button 
-              class="p-2 text-gray-400 hover:text-gray-600 transition-colors rounded-lg hover:bg-gray-100"
-              aria-label="Settings"
-            >
-              <Settings class="w-6 h-6" />
-            </button>
-
-            <button 
-              @click="handleLogout" 
-              class="flex items-center px-3 py-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-all text-sm"
-            >
-              <LogOut class="w-4 h-4 mr-2" />
-              Logout
-            </button>
-          </div>
-        </div>
-      </div>
-    </header>
-
-    <!-- Dashboard Content -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <!-- Loading State -->
-      <div v-if="isLoading" class="flex justify-center items-center py-12">
-        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-        <span class="ml-3 text-gray-600">Loading your dashboard...</span>
-      </div>
-
-      <!-- Error State -->
-      <div v-else-if="errorState" class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-        <div class="flex">
-          <div class="flex-shrink-0">
-            <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
-            </svg>
-          </div>
-          <div class="ml-3">
-            <h3 class="text-sm font-medium text-red-800">Failed to load dashboard</h3>
-            <p class="mt-1 text-sm text-red-700">{{ errorState }}</p>
-            <button 
-              @click="loadDashboardData" 
-              class="mt-2 text-sm text-red-600 hover:text-red-500 underline"
-            >
-              Try again
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Dashboard Content -->
-      <div v-else class="space-y-8">
-        <!-- Stats Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <!-- New Requests -->
-          <div class="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow">
-            <div class="flex items-center">
-              <div class="flex-shrink-0">
-                <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                  <Bell class="w-4 h-4 text-blue-600" />
-                </div>
-              </div>
-              <div class="ml-4">
-                <p class="text-sm font-medium text-gray-500">New Requests</p>
-                <p class="text-2xl font-semibold text-gray-900">{{ stats.newRequests }}</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Active Quotes -->
-          <div class="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow">
-            <div class="flex items-center">
-              <div class="flex-shrink-0">
-                <div class="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center">
-                  <DollarSign class="w-4 h-4 text-emerald-600" />
-                </div>
-              </div>
-              <div class="ml-4">
-                <p class="text-sm font-medium text-gray-500">Active Quotes</p>
-                <p class="text-2xl font-semibold text-gray-900">{{ stats.activeQuotes }}</p>
-              </div>
-            </div>
-          </div>
-          
-          <!-- Published Stories -->
-          <div 
-            @click="goToStoryBuilder" 
-            class="bg-white rounded-lg p-6 shadow hover:shadow-md transition-shadow cursor-pointer"
-          >
-            <div class="flex items-center">
-              <div class="flex-shrink-0">
-                <div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
-                  <BookOpen class="w-4 h-4 text-purple-600" />
-                </div>
-              </div>
-              <div class="ml-4">
-                <p class="text-sm font-medium text-gray-500">Published Stories</p>
-                <p class="text-2xl font-semibold text-gray-900">{{ provider.totalStories || 0 }}</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Rating -->
-          <div class="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow">
-            <div class="flex items-center">
-              <div class="flex-shrink-0">
-                <div class="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
-                  <Star class="w-4 h-4 text-yellow-600" />
-                </div>
-              </div>
-              <div class="ml-4">
-                <p class="text-sm font-medium text-gray-500">Rating</p>
-                <p class="text-2xl font-semibold text-gray-900">{{ formatRating(stats.rating) }}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Story Builder CTA -->
-        <div class="bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 rounded-xl p-6 text-white">
-          <div class="flex items-center justify-between">
-            <div class="flex-1">
-              <h3 class="text-xl font-bold mb-2">Tell Your Professional Story</h3>
-              <p class="text-purple-100 mb-4">Share your work and expertise to attract more customers</p>
-              <div class="flex items-center text-sm text-purple-100">
-                <span class="mr-4">📸 Showcase your work</span>
-                <span class="mr-4">🎥 Add voice introduction</span>
-                <span>⭐ Stand out from competition</span>
-              </div>
-            </div>
-            <div class="ml-6">
+              
               <button 
-                @click="goToStoryBuilder"
-                class="bg-white text-purple-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-colors shadow-lg flex items-center"
+                @click="switchToLanguage('sw')"
+                :class="[
+                  'w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors flex items-center justify-between',
+                  currentLanguage === 'sw' ? 'bg-blue-50 border-r-2 border-blue-500' : ''
+                ]"
               >
-                <BookOpen class="w-5 h-5 mr-2" />
-                Create Story
+                <div class="flex items-center space-x-3">
+                  <span class="text-lg">🇰🇪</span>
+                  <div>
+                    <div class="text-sm font-medium text-gray-900">Kiswahili</div>
+                    <div class="text-xs text-gray-500">Swahili</div>
+                  </div>
+                </div>
+                <Check v-if="currentLanguage === 'sw'" class="w-4 h-4 text-blue-600" />
               </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Main Content Grid -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <!-- Quote Requests -->
-          <div class="lg:col-span-2">
-            <div class="bg-white rounded-lg shadow">
-              <div class="px-6 py-4 border-b border-gray-200">
-                <h2 class="text-lg font-semibold text-gray-900">Quote Requests</h2>
-                
-                <!-- Tabs -->
-                <div class="mt-4">
-                  <div class="border-b border-gray-200">
-                    <nav class="-mb-px flex space-x-8">
-                      <button 
-                        @click="activeTab = 'new'"
-                        :class="[
-                          'py-2 px-1 border-b-2 font-medium text-sm',
-                          activeTab === 'new' 
-                            ? 'border-blue-500 text-blue-600' 
-                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                        ]"
-                      >
-                        New ({{ newQuotes.length }})
-                      </button>
-                      <button 
-                        @click="activeTab = 'responded'"
-                        :class="[
-                          'py-2 px-1 border-b-2 font-medium text-sm',
-                          activeTab === 'responded' 
-                            ? 'border-blue-500 text-blue-600' 
-                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                        ]"
-                      >
-                        Responded ({{ respondedQuotes.length }})
-                      </button>
-                    </nav>
-                  </div>
-                </div>
-              </div>
-
-              <div class="divide-y divide-gray-200">
-                <!-- New Quotes Tab -->
-                <div v-if="activeTab === 'new'">
-                  <div v-if="newQuotes.length === 0" class="p-8 text-center">
-                    <Bell class="mx-auto h-12 w-12 text-gray-400" />
-                    <h3 class="mt-2 text-sm font-medium text-gray-900">No new requests</h3>
-                    <p class="mt-1 text-sm text-gray-500">New quote requests will appear here when customers contact you.</p>
-                  </div>
-                  
-                  <div v-for="quote in newQuotes" :key="quote.id" class="p-6 hover:bg-gray-50">
-                    <div class="flex justify-between items-start">
-                      <div class="flex-1">
-                        <h3 class="text-lg font-medium text-gray-900">{{ quote.customerName }}</h3>
-                        <p class="text-sm text-gray-500">{{ quote.serviceType }}</p>
-                        <p class="mt-2 text-sm text-gray-700 line-clamp-2">{{ quote.description }}</p>
-                      </div>
-                      <div class="flex items-center space-x-2 ml-4">
-                        <button 
-                          @click="respondToQuote(quote)"
-                          class="px-3 py-1 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition-colors"
-                        >
-                          Respond
-                        </button>
-                      </div>
-                    </div>
-                    <div class="mt-4 grid grid-cols-2 gap-4 text-sm">
-                      <div class="flex items-center">
-                        <MapPin class="w-4 h-4 text-gray-400 mr-2" />
-                        <span>{{ quote.location }}</span>
-                      </div>
-                      <div class="flex items-center">
-                        <DollarSign class="w-4 h-4 text-gray-400 mr-2" />
-                        <span>{{ formatBudget(quote.budget) }}</span>
-                      </div>
-                      <div class="flex items-center">
-                        <Clock class="w-4 h-4 text-gray-400 mr-2" />
-                        <span>{{ formatTimeline(quote.timeline) }}</span>
-                      </div>
-                      <div class="flex items-center">
-                        <Calendar class="w-4 h-4 text-gray-400 mr-2" />
-                        <span>{{ formatDate(quote.submittedAt) }}</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Responded Quotes Tab -->
-                <div v-if="activeTab === 'responded'">
-                  <div v-if="respondedQuotes.length === 0" class="p-8 text-center">
-                    <CheckCircle class="mx-auto h-12 w-12 text-gray-400" />
-                    <h3 class="mt-2 text-sm font-medium text-gray-900">No responses yet</h3>
-                    <p class="mt-1 text-sm text-gray-500">Quotes you've responded to will appear here.</p>
-                  </div>
-                  
-                  <div v-for="quote in respondedQuotes" :key="quote.id" class="p-6 hover:bg-gray-50">
-                    <div class="flex justify-between items-start">
-                      <div class="flex-1">
-                        <h3 class="text-lg font-medium text-gray-900">{{ quote.customerName }}</h3>
-                        <p class="text-sm text-gray-500">{{ quote.serviceType }}</p>
-                        <p class="mt-2 text-sm text-gray-700">{{ quote.response }}</p>
-                      </div>
-                      <div class="flex items-center space-x-2 ml-4">
-                        <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
-                          {{ quote.status === 'accepted' ? 'Accepted' : 'Quoted' }}
-                        </span>
-                      </div>
-                    </div>
-                    <div class="mt-4 grid grid-cols-2 gap-4 text-sm">
-                      <div class="flex items-center">
-                        <DollarSign class="w-4 h-4 text-gray-400 mr-2" />
-                        <span class="font-medium">{{ quote.quoteAmount }}</span>
-                      </div>
-                      <div class="flex items-center">
-                        <Calendar class="w-4 h-4 text-gray-400 mr-2" />
-                        <span>{{ formatDate(quote.respondedAt) }}</span>
-                      </div>
-                    </div>
-                    <div class="mt-4 flex space-x-3">
-                      <button 
-                        @click="callCustomer(quote.phone)"
-                        class="flex items-center px-3 py-1 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors"
-                      >
-                        <Phone class="w-4 h-4 mr-2" />
-                        Call
-                      </button>
-                      <button 
-                        @click="whatsappCustomer(quote)"
-                        class="flex items-center px-3 py-1 bg-green-100 text-green-700 rounded-md hover:bg-green-200 transition-colors"
-                      >
-                        <MessageCircle class="w-4 h-4 mr-2" />
-                        WhatsApp
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Sidebar -->
-          <div class="space-y-6">
-            <!-- Quick Actions -->
-            <div class="bg-white rounded-lg shadow p-6">
-              <h3 class="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
-              <div class="space-y-3">
-                <button 
-                  @click="showScheduleModal = true"
-                  class="w-full flex items-center p-3 text-left rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
-                >
-                  <Calendar class="w-5 h-5 text-gray-400 mr-3" />
-                  <div>
-                    <div class="text-sm font-medium text-gray-900">Schedule</div>
-                    <div class="text-xs text-gray-500">Manage availability</div>
-                  </div>
-                </button>
-                
-                <button 
-                  @click="goToEarnings"
-                  class="w-full flex items-center p-3 text-left rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
-                >
-                  <DollarSign class="w-5 h-5 text-gray-400 mr-3" />
-                  <div>
-                    <div class="text-sm font-medium text-gray-900">Earnings</div>
-                    <div class="text-xs text-gray-500">View payments</div>
-                  </div>
-                </button>
-                
-                <button 
-                  @click="goToReviews"
-                  class="w-full flex items-center p-3 text-left rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
-                >
-                  <Star class="w-5 h-5 text-gray-400 mr-3" />
-                  <div>
-                    <div class="text-sm font-medium text-gray-900">Reviews</div>
-                    <div class="text-xs text-gray-500">Customer feedback</div>
-                  </div>
-                </button>
-                
-                <button 
-                  @click="goToSettings"
-                  class="w-full flex items-center p-3 text-left rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
-                >
-                  <Settings class="w-5 h-5 text-gray-400 mr-3" />
-                  <div>
-                    <div class="text-sm font-medium text-gray-900">Settings</div>
-                    <div class="text-xs text-gray-500">Account & profile</div>
-                  </div>
-                </button>
-              </div>
-            </div>
-
-            <!-- Performance This Month -->
-            <div class="bg-white rounded-lg shadow p-6">
-              <h3 class="text-lg font-semibold text-gray-900 mb-4">This Month</h3>
-              <div class="space-y-4">
-                <div>
-                  <div class="flex justify-between items-center mb-1">
-                    <span class="text-sm text-gray-600">Response Rate</span>
-                    <span class="text-sm font-semibold text-gray-900">{{ performance.responseRate }}%</span>
-                  </div>
-                  <div class="w-full bg-gray-200 rounded-full h-2">
-                    <div 
-                      class="bg-emerald-500 h-2 rounded-full transition-all duration-500" 
-                      :style="{ width: performance.responseRate + '%' }"
-                    ></div>
-                  </div>
-                </div>
-                
-                <div>
-                  <div class="flex justify-between items-center">
-                    <span class="text-sm text-gray-600">Avg Response Time</span>
-                    <span class="text-sm font-semibold text-gray-900">{{ performance.avgResponseTime }}</span>
-                  </div>
-                </div>
-                
-                <div>
-                  <div class="flex justify-between items-center">
-                    <span class="text-sm text-gray-600">Jobs Completed</span>
-                    <span class="text-sm font-semibold text-gray-900">{{ performance.jobsCompleted }}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Recent Activity -->
-            <div class="bg-white rounded-lg shadow p-6">
-              <h3 class="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
-              <div class="space-y-3">
-                <div v-for="activity in recentActivity" :key="activity.id" class="flex items-start space-x-3">
-                  <div class="flex-shrink-0">
-                    <div :class="[
-                      'w-8 h-8 rounded-full flex items-center justify-center',
-                      getActivityColor(activity.type)
-                    ]">
-                      <component :is="getActivityIcon(activity.type)" class="w-4 h-4" />
-                    </div>
-                  </div>
-                  <div class="flex-1 min-w-0">
-                    <p class="text-sm text-gray-900">{{ activity.description }}</p>
-                    <p class="text-xs text-gray-500">{{ formatTimeAgo(activity.timestamp) }}</p>
-                  </div>
-                </div>
-                <div v-if="recentActivity.length === 0" class="text-center py-4 text-sm text-gray-500">
-                  No recent activity
-                </div>
-              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Schedule Modal Placeholder -->
-    <div 
-      v-if="showScheduleModal" 
-      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
-    >
-      <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-6">
-        <h3 class="text-xl font-bold text-gray-900 mb-4">Schedule Management</h3>
-        <p class="text-gray-600 mb-4">Schedule management functionality will be implemented here.</p>
-        <button 
-          @click="showScheduleModal = false"
-          class="w-full py-2 px-4 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
+    <!-- Loading State -->
+    <div v-if="isLoading" class="flex justify-center items-center py-12">
+      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      <span class="ml-3 text-gray-600">Loading your dashboard...</span>
+    </div>
+
+    <!-- Error State -->
+    <div v-else-if="errorState" class="bg-red-50 border border-red-200 rounded-lg p-4">
+      <div class="flex">
+        <div class="flex-shrink-0">
+          <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+          </svg>
+        </div>
+        <div class="ml-3">
+          <h3 class="text-sm font-medium text-red-800">Failed to load dashboard</h3>
+          <p class="mt-1 text-sm text-red-700">{{ errorState }}</p>
+          <button 
+            @click="loadDashboardData" 
+            class="mt-2 text-sm text-red-600 hover:text-red-500 underline"
+          >
+            Try again
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dashboard Content -->
+    <div v-else class="space-y-6">
+      <!-- Stats Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <!-- New Requests -->
+        <div class="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                <Bell class="w-4 h-4 text-blue-600" />
+              </div>
+            </div>
+            <div class="ml-4">
+              <p class="text-sm font-medium text-gray-500">New Requests</p>
+              <p class="text-2xl font-semibold text-gray-900">{{ stats.newRequests }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Active Quotes -->
+        <div class="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <div class="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center">
+                <DollarSign class="w-4 h-4 text-emerald-600" />
+              </div>
+            </div>
+            <div class="ml-4">
+              <p class="text-sm font-medium text-gray-500">Active Quotes</p>
+              <p class="text-2xl font-semibold text-gray-900">{{ stats.activeQuotes }}</p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Published Stories -->
+        <div 
+          @click="goToStoryBuilder" 
+          class="bg-white rounded-lg p-6 shadow hover:shadow-md transition-shadow cursor-pointer group"
         >
-          Close
-        </button>
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center group-hover:bg-purple-200 transition-colors">
+                <BookOpen class="w-4 h-4 text-purple-600" />
+              </div>
+            </div>
+            <div class="ml-4">
+              <p class="text-sm font-medium text-gray-500">Published Stories</p>
+              <p class="text-2xl font-semibold text-gray-900">{{ provider.totalStories || 0 }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Rating -->
+        <div class="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <div class="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
+                <Star class="w-4 h-4 text-yellow-600" />
+              </div>
+            </div>
+            <div class="ml-4">
+              <p class="text-sm font-medium text-gray-500">Rating</p>
+              <p class="text-2xl font-semibold text-gray-900">{{ formatRating(stats.rating) }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Story Builder CTA -->
+      <div class="bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 rounded-xl p-6 text-white">
+        <div class="flex items-center justify-between">
+          <div class="flex-1">
+            <h3 class="text-xl font-bold mb-2">Tell Your Professional Story</h3>
+            <p class="text-purple-100 mb-4">Share your work and expertise to attract more customers</p>
+            <div class="flex flex-wrap items-center text-sm text-purple-100 gap-4">
+              <span class="flex items-center">📸 Showcase your work</span>
+              <span class="flex items-center">🎥 Add voice introduction</span>
+              <span class="flex items-center">⭐ Stand out from competition</span>
+            </div>
+          </div>
+          <div class="ml-6">
+            <button 
+              @click="goToStoryBuilder"
+              class="bg-white text-purple-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-colors shadow-lg flex items-center"
+            >
+              <BookOpen class="w-5 h-5 mr-2" />
+              Create Story
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Content Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Quote Requests -->
+        <div class="lg:col-span-2">
+          <div class="bg-white rounded-lg shadow">
+            <div class="px-6 py-4 border-b border-gray-200">
+              <h2 class="text-lg font-semibold text-gray-900">Quote Requests</h2>
+              
+              <!-- Tabs -->
+              <div class="mt-4">
+                <div class="border-b border-gray-200">
+                  <nav class="-mb-px flex space-x-8">
+                    <button 
+                      @click="activeTab = 'new'"
+                      :class="[
+                        'py-2 px-1 border-b-2 font-medium text-sm',
+                        activeTab === 'new' 
+                          ? 'border-blue-500 text-blue-600' 
+                          : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                      ]"
+                    >
+                      New ({{ newQuotes.length }})
+                    </button>
+                    <button 
+                      @click="activeTab = 'responded'"
+                      :class="[
+                        'py-2 px-1 border-b-2 font-medium text-sm',
+                        activeTab === 'responded' 
+                          ? 'border-blue-500 text-blue-600' 
+                          : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                      ]"
+                    >
+                      Responded ({{ respondedQuotes.length }})
+                    </button>
+                  </nav>
+                </div>
+              </div>
+            </div>
+
+            <div class="divide-y divide-gray-200">
+              <!-- New Quotes Tab -->
+              <div v-if="activeTab === 'new'">
+                <div v-if="newQuotes.length === 0" class="p-8 text-center">
+                  <Bell class="mx-auto h-12 w-12 text-gray-400" />
+                  <h3 class="mt-2 text-sm font-medium text-gray-900">No new requests</h3>
+                  <p class="mt-1 text-sm text-gray-500">New quote requests will appear here when customers contact you.</p>
+                </div>
+                
+                <div v-for="quote in newQuotes" :key="quote.id" class="p-6 hover:bg-gray-50">
+                  <div class="flex justify-between items-start">
+                    <div class="flex-1">
+                      <h3 class="text-lg font-medium text-gray-900">{{ quote.customerName }}</h3>
+                      <p class="text-sm text-gray-500">{{ quote.serviceType }}</p>
+                      <p class="mt-2 text-sm text-gray-700 line-clamp-2">{{ quote.description }}</p>
+                    </div>
+                    <div class="flex items-center space-x-2 ml-4">
+                      <button 
+                        @click="respondToQuote(quote)"
+                        class="px-3 py-1 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition-colors"
+                      >
+                        Respond
+                      </button>
+                    </div>
+                  </div>
+                  <div class="mt-4 grid grid-cols-2 gap-4 text-sm">
+                    <div class="flex items-center">
+                      <MapPin class="w-4 h-4 text-gray-400 mr-2" />
+                      <span>{{ quote.location }}</span>
+                    </div>
+                    <div class="flex items-center">
+                      <DollarSign class="w-4 h-4 text-gray-400 mr-2" />
+                      <span>{{ formatBudget(quote.budget) }}</span>
+                    </div>
+                    <div class="flex items-center">
+                      <Clock class="w-4 h-4 text-gray-400 mr-2" />
+                      <span>{{ formatTimeline(quote.timeline) }}</span>
+                    </div>
+                    <div class="flex items-center">
+                      <Calendar class="w-4 h-4 text-gray-400 mr-2" />
+                      <span>{{ formatDate(quote.submittedAt) }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Responded Quotes Tab -->
+              <div v-if="activeTab === 'responded'">
+                <div v-if="respondedQuotes.length === 0" class="p-8 text-center">
+                  <CheckCircle class="mx-auto h-12 w-12 text-gray-400" />
+                  <h3 class="mt-2 text-sm font-medium text-gray-900">No responses yet</h3>
+                  <p class="mt-1 text-sm text-gray-500">Quotes you've responded to will appear here.</p>
+                </div>
+                
+                <div v-for="quote in respondedQuotes" :key="quote.id" class="p-6 hover:bg-gray-50">
+                  <div class="flex justify-between items-start">
+                    <div class="flex-1">
+                      <h3 class="text-lg font-medium text-gray-900">{{ quote.customerName }}</h3>
+                      <p class="text-sm text-gray-500">{{ quote.serviceType }}</p>
+                      <p class="mt-2 text-sm text-gray-700">{{ quote.response }}</p>
+                    </div>
+                    <div class="flex items-center space-x-2 ml-4">
+                      <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
+                        {{ quote.status === 'accepted' ? 'Accepted' : 'Quoted' }}
+                      </span>
+                    </div>
+                  </div>
+                  <div class="mt-4 grid grid-cols-2 gap-4 text-sm">
+                    <div class="flex items-center">
+                      <DollarSign class="w-4 h-4 text-gray-400 mr-2" />
+                      <span class="font-medium">{{ quote.quoteAmount }}</span>
+                    </div>
+                    <div class="flex items-center">
+                      <Calendar class="w-4 h-4 text-gray-400 mr-2" />
+                      <span>{{ formatDate(quote.respondedAt) }}</span>
+                    </div>
+                  </div>
+                  <div class="mt-4 flex space-x-3">
+                    <button 
+                      @click="callCustomer(quote.phone)"
+                      class="flex items-center px-3 py-1 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors"
+                    >
+                      <Phone class="w-4 h-4 mr-2" />
+                      Call
+                    </button>
+                    <button 
+                      @click="whatsappCustomer(quote)"
+                      class="flex items-center px-3 py-1 bg-green-100 text-green-700 rounded-md hover:bg-green-200 transition-colors"
+                    >
+                      <MessageCircle class="w-4 h-4 mr-2" />
+                      WhatsApp
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="space-y-6">
+          <!-- Performance This Month -->
+          <div class="bg-white rounded-lg shadow p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">This Month</h3>
+            <div class="space-y-4">
+              <div>
+                <div class="flex justify-between items-center mb-1">
+                  <span class="text-sm text-gray-600">Response Rate</span>
+                  <span class="text-sm font-semibold text-gray-900">{{ performance.responseRate }}%</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2">
+                  <div 
+                    class="bg-emerald-500 h-2 rounded-full transition-all duration-500" 
+                    :style="{ width: performance.responseRate + '%' }"
+                  ></div>
+                </div>
+              </div>
+              
+              <div>
+                <div class="flex justify-between items-center">
+                  <span class="text-sm text-gray-600">Avg Response Time</span>
+                  <span class="text-sm font-semibold text-gray-900">{{ performance.avgResponseTime }}</span>
+                </div>
+              </div>
+              
+              <div>
+                <div class="flex justify-between items-center">
+                  <span class="text-sm text-gray-600">Jobs Completed</span>
+                  <span class="text-sm font-semibold text-gray-900">{{ performance.jobsCompleted }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Activity -->
+          <div class="bg-white rounded-lg shadow p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
+            <div class="space-y-3">
+              <div v-for="activity in recentActivity" :key="activity.id" class="flex items-start space-x-3">
+                <div class="flex-shrink-0">
+                  <div :class="[
+                    'w-8 h-8 rounded-full flex items-center justify-center',
+                    getActivityColor(activity.type)
+                  ]">
+                    <component :is="getActivityIcon(activity.type)" class="w-4 h-4" />
+                  </div>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm text-gray-900">{{ activity.description }}</p>
+                  <p class="text-xs text-gray-500">{{ formatTimeAgo(activity.timestamp) }}</p>
+                </div>
+              </div>
+              <div v-if="recentActivity.length === 0" class="text-center py-4 text-sm text-gray-500">
+                No recent activity
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -487,7 +394,7 @@ import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { 
   Bell, DollarSign, Star, Calendar, MapPin, Clock, Phone, MessageCircle,
-  CheckCircle, Settings, ChevronDown, Check, BookOpen, LogOut
+  CheckCircle, ChevronDown, Check, BookOpen
 } from 'lucide-vue-next'
 import { useAuthStore } from '@/stores/auth'
 import ApiService from '@/services/api'
@@ -499,7 +406,6 @@ const { t, locale } = useI18n()
 
 // Component state
 const activeTab = ref('new')
-const showScheduleModal = ref(false)
 const showLanguageDropdown = ref(false)
 const isLoading = ref(false)
 const errorState = ref(null)
@@ -552,7 +458,7 @@ const validateUserAccess = () => {
   
   if (!authStore.isAuthenticated) {
     console.log('❌ User not authenticated, redirecting to login')
-    router.push('/app')
+    router.push('/app/login')
     throw new Error('User not authenticated')
   }
   
@@ -841,38 +747,19 @@ const switchToLanguage = async (langCode) => {
   }
 }
 
-// Navigation methods
+// Navigation methods (use router navigation to work with layout)
 const goToStoryBuilder = () => {
-  router.push('/app/provider-dashboard/story-builder')
-}
-
-const goToEarnings = () => {
-  router.push('/app/provider-dashboard/earnings')
-}
-
-const goToReviews = () => {
-  router.push('/app/provider-dashboard/reviews')
-}
-
-const goToSettings = () => {
-  router.push('/app/provider-dashboard/settings')
-}
-
-const handleLogout = async () => {
-  try {
-    console.log('🚪 Provider logging out...')
-    await authStore.logout()
-    router.push('/app')
-  } catch (error) {
-    console.error('❌ Logout failed:', error)
-  }
+  router.push({ name: 'provider-story-builder' })
 }
 
 // Quote handling methods
 const respondToQuote = (quote) => {
   console.log('💬 Responding to quote:', quote.id)
-  // This would open a quote response modal
-  alert(`Quote response functionality will be implemented for ${quote.customerName}`)
+  // Navigate to quote response modal/page
+  router.push({ 
+    name: 'provider-quote-response',
+    query: { quoteId: quote.id }
+  })
 }
 
 const callCustomer = (phone) => {
@@ -1100,12 +987,6 @@ a:focus-visible {
 /* Progress bar animation */
 .progress-bar {
   transition: width 0.5s ease-in-out;
-}
-
-/* Tab active state */
-.tab-active {
-  border-bottom-color: #3b82f6;
-  color: #3b82f6;
 }
 
 /* Responsive design */

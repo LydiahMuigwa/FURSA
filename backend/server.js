@@ -1,56 +1,43 @@
-const fs = require('fs');
-console.log('PWD:', process.cwd());
-console.log('ENV FILE EXISTS:', fs.existsSync('.env'));
-if (fs.existsSync('.env')) {
-  console.log('ENV FILE CONTENTS:\n', fs.readFileSync('.env', 'utf8'));
-}
-const dotenv = require('dotenv');
-const result = dotenv.config();
-console.log('dotenv result:', result);
-console.log('MONGODB_URI:', process.env.MONGODB_URI);
+// backend/server.js - COMPLETE FIX
+const express = require('express')
+const mongoose = require('mongoose')
+const cors = require('cors')
+const helmet = require('helmet')
+const rateLimit = require('express-rate-limit')
+require('dotenv').config()
 
-const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
-const helmet = require('helmet');
-const morgan = require('morgan');
-const rateLimit = require('express-rate-limit');
-
-const app = express();
+const app = express()
 
 // Security middleware
-app.use(helmet());
-app.use(cors());
-app.use(morgan('combined'));
+app.use(helmet())
+app.use(cors())
 
 // Rate limiting
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100
-});
-app.use(limiter);
+})
+app.use(limiter)
 
-// Body parser middleware
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true }));
+// Body parsing
+app.use(express.json({ limit: '10mb' }))
+app.use(express.urlencoded({ extended: true }))
 
-// Routes
-app.get('/', (req, res) => {
-  res.json({ message: 'ZIVU API is running!' });
-});
-
+// Routes - FIXED: Add missing auth routes
+const authRoutes = require('./routes/auth')
 const serviceProviderRoutes = require('./routes/serviceProviders')
-app.use('/api/service-providers', serviceProviderRoutes)
-
 const talentRoutes = require('./routes/talent')
+
+app.use('/api/auth', authRoutes)
+app.use('/api/service-providers', serviceProviderRoutes)
 app.use('/api/talents', talentRoutes)
 
-// Connect to MongoDB
+// MongoDB connection
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('✅ Connected to MongoDB'))
-  .catch(err => console.error('❌ MongoDB connection error:', err));
+  .catch(err => console.error('❌ MongoDB connection error:', err))
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5000
 app.listen(PORT, () => {
-  console.log(`🚀 ZIVU server running on port ${PORT}`);
-});
+  console.log(`🚀 FURSA server running on port ${PORT}`)
+})

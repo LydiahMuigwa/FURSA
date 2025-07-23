@@ -1,4 +1,4 @@
-<!-- frontend/src/layouts/ProviderDashboardLayout.vue - COMPLETE FIXED VERSION -->
+<!-- frontend/src/layouts/ProviderDashboardLayout.vue - ENHANCED: All components connected -->
 <template>
   <div class="min-h-screen bg-gray-50">
     <!-- Top Navigation Bar -->
@@ -27,7 +27,8 @@
           <!-- Right side -->
           <div class="flex items-center space-x-4">
             <!-- Notifications -->
-            <button class="relative p-2 text-gray-400 hover:text-gray-500 focus:outline-none focus:text-gray-500">
+            <button @click="openAllBookings" 
+                    class="relative p-2 text-gray-400 hover:text-gray-500 focus:outline-none focus:text-gray-500">
               <Bell class="w-6 h-6" />
               <span v-if="notificationCount > 0" 
                     class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full">
@@ -56,7 +57,7 @@
               <div v-if="showProfileMenu" 
                    @click.away="showProfileMenu = false"
                    class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
-                <router-link to="/app/provider-dashboard/profile" 
+                <router-link to="/app/provider-dashboard/profile-edit" 
                             class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                   <User class="w-4 h-4 inline mr-2" />
                   Your Profile
@@ -82,8 +83,9 @@
     <!-- Main Content Area -->
     <div class="flex">
       <!-- Sidebar Navigation -->
-      <aside class="w-64 bg-white shadow-sm h-screen sticky top-16">
-        <nav class="mt-8 px-4">
+      <aside class="w-64 bg-white shadow-sm h-screen sticky top-16 overflow-y-auto">
+        <nav class="mt-8 px-4 pb-8">
+          <!-- MAIN NAVIGATION -->
           <div class="space-y-2">
             <!-- Dashboard -->
             <router-link to="/app/provider-dashboard" 
@@ -104,21 +106,29 @@
               </span>
             </router-link>
 
+            <!-- My Stories -->
+            <router-link to="/app/provider-dashboard/my-stories" 
+                        :class="getSidebarLinkClass('my-stories')"
+                        class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors">
+              <FileText class="w-5 h-5 mr-3" />
+              My Stories
+            </router-link>
+
+            <!-- Portfolio Manager -->
+            <router-link to="/app/provider-dashboard/portfolio-manager" 
+                        :class="getSidebarLinkClass('portfolio-manager')"
+                        class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors">
+              <Images class="w-5 h-5 mr-3" />
+              Portfolio
+            </router-link>
+
             <!-- Profile -->
-            <router-link to="/app/provider-dashboard/profile" 
-                        :class="getSidebarLinkClass('profile')"
+            <router-link to="/app/provider-dashboard/profile-edit" 
+                        :class="getSidebarLinkClass('profile-edit')"
                         class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors">
               <User class="w-5 h-5 mr-3" />
               My Profile
             </router-link>
-
-            <!-- Schedule - FIXED: Now opens existing modal instead of router link -->
-            <button @click="openScheduleModal" 
-                    :class="getSidebarLinkClass('schedule')"
-                    class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors w-full text-left">
-              <Calendar class="w-5 h-5 mr-3" />
-              Schedule
-            </button>
 
             <!-- Earnings -->
             <router-link to="/app/provider-dashboard/earnings" 
@@ -137,6 +147,124 @@
             </router-link>
           </div>
 
+          <!-- SCHEDULE SECTION -->
+          <div class="mt-6">
+            <h3 class="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Schedule</h3>
+            <div class="mt-2 space-y-1">
+              <router-link to="/app/provider-dashboard/modals/schedule-management" 
+                          :class="getSidebarLinkClass('schedule-management')"
+                          class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors">
+                <Calendar class="w-5 h-5 mr-3" />
+                Manage Schedule
+              </router-link>
+              
+              <router-link to="/app/provider-dashboard/modals/schedule-appointment" 
+                          :class="getSidebarLinkClass('schedule-appointment')"
+                          class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors">
+                <Clock class="w-5 h-5 mr-3" />
+                New Appointment
+              </router-link>
+              
+              <router-link to="/app/provider-dashboard/modals/weekly-hours" 
+                          :class="getSidebarLinkClass('weekly-hours')"
+                          class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors">
+                <Timer class="w-5 h-5 mr-3" />
+                Weekly Hours
+              </router-link>
+            </div>
+          </div>
+
+          <!-- BOOKINGS & QUOTES SECTION -->
+          <div class="mt-6">
+            <h3 class="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Bookings & Quotes</h3>
+            <div class="mt-2 space-y-1">
+              <router-link to="/app/provider-dashboard/modals/all-bookings" 
+                          :class="getSidebarLinkClass('all-bookings')"
+                          class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors">
+                <Calendar class="w-5 h-5 mr-3" />
+                All Bookings
+                <span v-if="newBookings > 0" class="ml-auto inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+                  {{ newBookings }}
+                </span>
+              </router-link>
+              
+              <router-link to="/app/provider-dashboard/modals/quote-response" 
+                          :class="getSidebarLinkClass('quote-response')"
+                          class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors">
+                <MessageSquare class="w-5 h-5 mr-3" />
+                Quote Responses
+              </router-link>
+              
+              <router-link to="/app/provider-dashboard/forms/quote-request" 
+                          :class="getSidebarLinkClass('quote-request')"
+                          class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors">
+                <FileEdit class="w-5 h-5 mr-3" />
+                Quote Requests
+              </router-link>
+            </div>
+          </div>
+
+          <!-- TOOLS & UTILITIES SECTION -->
+          <div class="mt-6">
+            <h3 class="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Tools & Utilities</h3>
+            <div class="mt-2 space-y-1">
+              <router-link to="/app/provider-dashboard/tools/photo-upload" 
+                          :class="getSidebarLinkClass('photo-upload')"
+                          class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors">
+                <Upload class="w-5 h-5 mr-3" />
+                Photo Upload
+              </router-link>
+              
+              <router-link to="/app/provider-dashboard/modals/photo-viewer" 
+                          :class="getSidebarLinkClass('photo-viewer')"
+                          class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors">
+                <Eye class="w-5 h-5 mr-3" />
+                Photo Viewer
+              </router-link>
+              
+              <router-link to="/app/provider-dashboard/tools/story-preview" 
+                          :class="getSidebarLinkClass('story-preview')"
+                          class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors">
+                <FilePreview class="w-5 h-5 mr-3" />
+                Story Preview
+              </router-link>
+              
+              <router-link to="/app/provider-dashboard/forms/location-picker" 
+                          :class="getSidebarLinkClass('location-picker')"
+                          class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors">
+                <MapPin class="w-5 h-5 mr-3" />
+                Location Picker
+              </router-link>
+            </div>
+          </div>
+
+          <!-- COMPONENT SHOWCASE SECTION (FOR TESTING) -->
+          <div class="mt-6" v-if="showDevTools">
+            <h3 class="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Component Showcase</h3>
+            <div class="mt-2 space-y-1">
+              <router-link to="/app/provider-dashboard/showcase/booking-card" 
+                          :class="getSidebarLinkClass('booking-card')"
+                          class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors">
+                <CreditCard class="w-5 h-5 mr-3" />
+                Booking Card
+              </router-link>
+              
+              <router-link to="/app/provider-dashboard/showcase/quote-request-card" 
+                          :class="getSidebarLinkClass('quote-request-card')"
+                          class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors">
+                <MessageCircle class="w-5 h-5 mr-3" />
+                Quote Request Card
+              </router-link>
+              
+              <router-link to="/app/provider-dashboard/showcase/service-provider-card" 
+                          :class="getSidebarLinkClass('service-provider-card')"
+                          class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors">
+                <UserCheck class="w-5 h-5 mr-3" />
+                Provider Card
+              </router-link>
+            </div>
+          </div>
+
           <!-- Quick Stats -->
           <div class="mt-8 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg">
             <h3 class="text-sm font-medium text-gray-700 mb-3">Quick Stats</h3>
@@ -153,15 +281,47 @@
                 <span class="text-gray-600">Rating</span>
                 <span class="font-semibold text-yellow-600">{{ rating }}★</span>
               </div>
+              <div class="flex justify-between text-sm">
+                <span class="text-gray-600">New Bookings</span>
+                <span class="font-semibold text-green-600">{{ newBookings }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Actions -->
+          <div class="mt-6 p-4 bg-gradient-to-r from-orange-50 to-yellow-50 rounded-lg">
+            <h3 class="text-sm font-medium text-orange-800 mb-3">Quick Actions</h3>
+            <div class="space-y-2">
+              <button @click="goToStoryBuilder" 
+                      class="w-full bg-orange-100 text-orange-800 px-3 py-2 rounded-md text-xs font-medium hover:bg-orange-200 transition-colors text-left">
+                📖 Create New Story
+              </button>
+              <button @click="openScheduleAppointment" 
+                      class="w-full bg-blue-100 text-blue-800 px-3 py-2 rounded-md text-xs font-medium hover:bg-blue-200 transition-colors text-left">
+                📅 Schedule Appointment
+              </button>
+              <button @click="openPhotoUpload" 
+                      class="w-full bg-green-100 text-green-800 px-3 py-2 rounded-md text-xs font-medium hover:bg-green-200 transition-colors text-left">
+                📸 Upload Photos
+              </button>
             </div>
           </div>
 
           <!-- Help Section -->
-          <div class="mt-6 p-4 bg-orange-50 rounded-lg">
-            <h3 class="text-sm font-medium text-orange-800 mb-2">Need Help?</h3>
-            <p class="text-xs text-orange-700 mb-3">Get started with your first customer</p>
-            <button class="w-full bg-orange-100 text-orange-800 px-3 py-2 rounded-md text-xs font-medium hover:bg-orange-200 transition-colors">
+          <div class="mt-6 p-4 bg-purple-50 rounded-lg">
+            <h3 class="text-sm font-medium text-purple-800 mb-2">Need Help?</h3>
+            <p class="text-xs text-purple-700 mb-3">Get started with your first customer</p>
+            <button @click="openContactSuccess" 
+                    class="w-full bg-purple-100 text-purple-800 px-3 py-2 rounded-md text-xs font-medium hover:bg-purple-200 transition-colors">
               📞 Get Support
+            </button>
+          </div>
+
+          <!-- Dev Tools Toggle -->
+          <div class="mt-6">
+            <button @click="showDevTools = !showDevTools" 
+                    class="w-full text-xs text-gray-500 hover:text-gray-700 transition-colors">
+              {{ showDevTools ? '🔧 Hide Dev Tools' : '🔧 Show Dev Tools' }}
             </button>
           </div>
         </nav>
@@ -172,12 +332,6 @@
         <router-view />
       </main>
     </div>
-
-    <!-- ADDED: Schedule Management Modal -->
-    <ScheduleManagementModal 
-      :is-open="showScheduleModal"
-      @close="showScheduleModal = false"
-    />
   </div>
 </template>
 
@@ -186,12 +340,11 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { 
-  Home, BookOpen, User, Calendar, DollarSign, Star, 
-  Bell, Settings, Briefcase, ChevronDown, LogOut 
+  Home, BookOpen, User, Calendar, FileText, Images, DollarSign, Star,
+  Bell, Settings, Briefcase, ChevronDown, LogOut, Clock, Timer,
+  MessageSquare, FileEdit, Upload, Eye, MapPin, CreditCard, 
+  MessageCircle, UserCheck
 } from 'lucide-vue-next'
-
-// ADDED: Import the existing schedule modal
-import ScheduleManagementModal from '@/components/service-provider/modals/ScheduleManagementModal.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -199,11 +352,12 @@ const authStore = useAuthStore()
 
 // Reactive data
 const showProfileMenu = ref(false)
-const showScheduleModal = ref(false) // ADDED: For schedule modal
+const showDevTools = ref(false) // Toggle for component showcase
 const notificationCount = ref(3)
 const profileCompleteness = ref(75)
 const monthlyStats = ref(5)
 const rating = ref(4.8)
+const newBookings = ref(2)
 
 // Computed
 const providerName = computed(() => {
@@ -221,9 +375,25 @@ const getSidebarLinkClass = (routeName) => {
     : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
 }
 
-// ADDED: Method to open schedule modal
-const openScheduleModal = () => {
-  showScheduleModal.value = true
+// Navigation methods using the enhanced navigationHelpers
+const goToStoryBuilder = () => {
+  router.push({ name: 'provider-story-builder' })
+}
+
+const openScheduleAppointment = () => {
+  router.push({ name: 'provider-schedule-appointment' })
+}
+
+const openPhotoUpload = () => {
+  router.push({ name: 'provider-photo-upload' })
+}
+
+const openContactSuccess = () => {
+  router.push({ name: 'provider-contact-success' })
+}
+
+const openAllBookings = () => {
+  router.push({ name: 'provider-all-bookings' })
 }
 
 const logout = async () => {
@@ -238,9 +408,9 @@ const logout = async () => {
 // Load provider data on mount
 onMounted(async () => {
   try {
-    // Load provider dashboard data
-    // This would typically come from an API call
-    console.log('Provider dashboard layout loaded')
+    console.log('Enhanced provider dashboard layout loaded')
+    // You can add logic to check if we're in development mode
+    showDevTools.value = import.meta.env.DEV || false
   } catch (error) {
     console.error('Failed to load provider data:', error)
   }
