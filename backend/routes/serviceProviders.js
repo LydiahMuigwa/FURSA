@@ -132,7 +132,7 @@ router.get('/', async (req, res) => {
       page = 1, 
       limit = 20,
       search,
-      includeStories  // 🆕 ADD THIS - enables portfolio display
+      includeStories
     } = req.query
 
     let query = { isActive: true }
@@ -169,7 +169,7 @@ router.get('/', async (req, res) => {
 
     const total = await ServiceProvider.countDocuments(query)
 
-    // 🆕 ENHANCE PROVIDERS WITH PORTFOLIO DATA
+    // Enhance providers with portfolio data
     const enhancedProviders = providers.map(provider => {
       const providerObj = provider.toObject()
       
@@ -200,7 +200,7 @@ router.get('/', async (req, res) => {
 
     res.json({
       success: true,
-      providers: enhancedProviders,  // 🆕 RETURN ENHANCED DATA
+      providers: enhancedProviders,
       pagination: {
         current: parseInt(page),
         pages: Math.ceil(total / limit),
@@ -283,7 +283,7 @@ router.post('/:id/stories', async (req, res) => {
       })
     }
 
-    // 🆕 ENHANCED STORY DATA STRUCTURE
+    // Enhanced story data structure
     const story = {
       id: new Date().getTime().toString(),
       title: req.body.title || 'Professional Project',
@@ -352,7 +352,7 @@ router.get('/:id/dashboard', async (req, res) => {
       })
     }
 
-    // 🆕 ENHANCED DASHBOARD DATA WITH PORTFOLIO STATS
+    // Enhanced dashboard data with portfolio stats
     const dashboardData = {
       provider: {
         id: provider._id,
@@ -375,7 +375,7 @@ router.get('/:id/dashboard', async (req, res) => {
         monthlyJobs: 0,
         
         // Portfolio stats
-        portfolioViews: 0, // Could be tracked later
+        portfolioViews: 0,
         storiesPublished: provider.stories ? provider.stories.length : 0
       },
       notifications: [],
@@ -398,7 +398,37 @@ router.get('/:id/dashboard', async (req, res) => {
   }
 })
 
-// 🆕 HELPER FUNCTIONS FOR PROFESSIONAL PORTFOLIO DISPLAY
+// DELETE /api/service-providers/:id/stories/:storyId - Delete a story
+router.delete('/:id/stories/:storyId', async (req, res) => {
+  try {
+    const provider = await ServiceProvider.findById(req.params.id)
+    if (!provider) {
+      return res.status(404).json({ 
+        success: false,
+        error: 'Provider not found' 
+      })
+    }
+
+    // Remove story from array
+    provider.stories = provider.stories.filter(story => story.id !== req.params.storyId)
+    provider.totalProjects = provider.stories.length
+    
+    await provider.save()
+
+    res.json({ 
+      success: true,
+      message: 'Story deleted successfully'
+    })
+  } catch (error) {
+    console.error('❌ Failed to delete story:', error)
+    res.status(500).json({ 
+      success: false,
+      error: 'Failed to delete story' 
+    })
+  }
+})
+
+// Helper functions for professional portfolio display
 
 // Transform casual titles into professional ones
 function professionalizeTitle(title) {

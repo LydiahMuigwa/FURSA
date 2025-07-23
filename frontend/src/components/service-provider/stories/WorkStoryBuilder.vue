@@ -605,48 +605,171 @@ const saveDraft = () => {
   // You could integrate with your notification system here
 }
 
+// 🚨 QUICK FIX for WorkStoryBuilder.vue publishStory method
+// Replace the existing publishStory method with this fixed version:
+
 const publishStory = async () => {
   isPublishing.value = true
   try {
-    const providerId = localStorage.getItem('providerId') || 'demo-provider-id'
+    // 🔧 MULTIPLE WAYS TO GET PROVIDER ID
+    let providerId = null
     
-    const storyData = {
-      title: this.storyData.title,
-      description: this.storyData.introduction,
-      projectType: this.storyData.projectType,
-      beforePhotos: this.storyData.beforePhotos || [],
-      processPhotos: this.storyData.processPhotos || [],
-      afterPhotos: this.storyData.afterPhotos || [],
-      projectPhotos: this.storyData.projectPhotos || [],
-      skills: this.storyData.skills || [],
-      customerImpact: this.storyData.customerImpact,
-      voiceRecording: this.audioRecording
+    // Method 1: Try localStorage first
+    providerId = localStorage.getItem('providerId')
+    
+    // Method 2: Try from auth store  
+    if (!providerId) {
+      // If you have auth store available
+      try {
+        const { useAuthStore } = await import('@/stores/auth')
+        const authStore = useAuthStore()
+        if (authStore.user && authStore.user._id) {
+          providerId = authStore.user._id
+        } else if (authStore.user && authStore.user.id) {
+          providerId = authStore.user.id
+        }
+      } catch (authError) {
+        console.warn('Auth store not available:', authError)
+      }
+    }
+    
+    // Method 3: Use the registered provider ID from console (temporary fix)
+    if (!providerId) {
+      // From your console log, we see: new ObjectId('687fe39ade42d1b1af6751df')
+      providerId = '687fe39ade42d1b1af6751df' // Your actual registered provider ID
+      console.log('⚠️ Using hardcoded provider ID (temporary fix):', providerId)
+    }
+    
+    // Method 4: Final fallback
+    if (!providerId) {
+      throw new Error('Unable to identify provider. Please log in again.')
+    }
+    
+    console.log('📤 Publishing story for provider:', providerId)
+
+    // 🔧 PREPARE STORY DATA (using composition API format)
+    const storyPayload = {
+      title: storyData.value.title || 'Professional Project',
+      description: storyData.value.introduction || storyData.value.description || 'Professional service completed successfully',
+      projectType: storyData.value.projectType || 'custom',
+      
+      // Photo organization
+      beforePhotos: storyData.value.beforePhotos || [],
+      processPhotos: storyData.value.processPhotos || [],
+      afterPhotos: storyData.value.afterPhotos || [],
+      projectPhotos: storyData.value.projectPhotos || [],
+      
+      // Professional details
+      skills: storyData.value.skills || [],
+      customerImpact: storyData.value.customerImpact || 'Customer was satisfied with the professional service',
+      voiceRecording: audioRecording.value,
+      
+      // Add metadata
+      createdAt: new Date().toISOString()
     }
 
+    console.log('📋 Story payload:', storyPayload)
+
+    // 🚀 MAKE API CALL
     const response = await fetch(`/api/service-providers/${providerId}/stories`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(storyData)
+      headers: { 
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify(storyPayload)
     })
 
-    if (response.ok) {
+    console.log('📡 API Response status:', response.status)
+
+    // 🔍 CHECK RESPONSE
+    if (!response.ok) {
+      const errorText = await response.text()
+      console.error('❌ API Error Response:', errorText)
+      throw new Error(`Server error: ${response.status} - ${errorText}`)
+    }
+
+    const result = await response.json()
+    console.log('✅ Story published successfully:', result)
+
+    if (result.success) {
+      // Clear draft
       localStorage.removeItem('workStoryDraft')
       
-      // SUCCESS - Show user their story is now live
-      alert('🎉 Your professional story is now live! It will appear in search results to attract customers.')
+      // 🎉 SUCCESS MESSAGE
+      alert('🎉 Your professional story is now live! It will appear in search results to help attract customers.')
       
-      // Redirect back to dashboard
-      this.$router.push('/app/provider-dashboard')
+      // Redirect back to dashboard  
+      this.$router.push('/app/provider-dashboard/my-stories?published=true')
+      
     } else {
-      throw new Error('Publishing failed')
+      throw new Error(result.message || 'Unknown server error')
     }
+
   } catch (error) {
-    console.error('Publishing failed:', error)
-    alert('Unable to publish your story. Please check your connection and try again.')
+    console.error('❌ Publishing failed:', error)
+    
+    // 🔧 USER-FRIENDLY ERROR MESSAGES
+    let errorMessage = 'Unable to publish your story.'
+    
+    if (error.message.includes('provider')) {
+      errorMessage = 'Please log in again and try publishing your story.'
+    } else if (error.message.includes('Network')) {
+      errorMessage = 'Please check your internet connection and try again.'
+    } else if (error.message.includes('Server')) {
+      errorMessage = 'Server is temporarily unavailable. Please try again in a moment.'
+    }
+    
+    alert(errorMessage)
+    
   } finally {
-    this.isPublishing.value = false
+    isPublishing.value = false
   }
 }
+
+// 🔧 TEMPORARY PROVIDER ID SETTER (for immediate testing)
+// Add this method to help set the provider ID manually
+const setProviderIdForTesting = () => {
+  // Use the ID from your registration console log
+  const testProviderId = '687fe39ade42d1b1af6751df'
+  localStorage.setItem('providerId', testProviderId)
+  console.log('🔧 Set provider ID for testing:', testProviderId)
+  alert('Provider ID set! You can now try publishing your story.')
+}
+
+// 🔧 DEBUGGING HELPER - Add this button temporarily to your template for testing
+// <button @click="setProviderIdForTesting" class="bg-red-500 text-white px-4 py-2 rounded">
+//   🔧 Debug: Set Provider ID
+// </button>
+
+// 🔧 REGISTRATION FIX - Ensure provider ID is stored during registration
+// Add this to your registration component after successful registration:
+
+const handleRegistrationSuccess = (result) => {
+  if (result.provider && result.provider.id) {
+    // Store the provider ID for future use
+    localStorage.setItem('providerId', result.provider.id)
+    localStorage.setItem('userType', 'provider')
+    localStorage.setItem('userName', result.provider.name)
+    
+    console.log('✅ Provider ID stored:', result.provider.id)
+  }
+  
+  // Redirect to dashboard
+  router.push('/app/provider-dashboard')
+}
+
+// 🔧 QUICK CHECK FUNCTION - Add this to see what's in localStorage
+const debugLocalStorage = () => {
+  console.log('🔍 Debugging localStorage:')
+  console.log('- providerId:', localStorage.getItem('providerId'))
+  console.log('- userType:', localStorage.getItem('userType'))
+  console.log('- userName:', localStorage.getItem('userName'))
+  console.log('- All keys:', Object.keys(localStorage))
+}
+
+// Call this function when component mounts to debug
+// debugLocalStorage()
 
 // Load draft on mount
 onMounted(() => {

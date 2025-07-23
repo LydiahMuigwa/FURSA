@@ -43,7 +43,7 @@ const serviceProviderSchema = new mongoose.Schema({
   experience: {
     type: String,
     required: true,
-    enum: ['0-1', '1-3', '3-5', '5-10', '10+']  // ✅ UPDATED - Router uses these values
+    enum: ['1-2', '3-5','6-10', '10+']  // ✅ UPDATED - Router uses these values
   },
   description: {
     type: String,

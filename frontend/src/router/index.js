@@ -110,6 +110,16 @@ const routes = [
     userType: 'provider'
   }
 },
+{
+  path: '/app/provider-dashboard/my-stories',
+  name: 'provider-my-stories',
+  component: () => import('@/components/service-provider/MyStories.vue'),
+  meta: {
+    title: 'My Stories - FURSA',
+    requiresAuth: true,
+    userType: 'provider'
+  }
+},
 
       {
         path: 'talent-dashboard',
